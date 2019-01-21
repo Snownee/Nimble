@@ -1,0 +1,12 @@
+[
+{
+  "modid": "nimble",
+  "name": "Nimble",
+  "description": "Nimble is a mod by Snownee.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Snownee"]
+}
+]
