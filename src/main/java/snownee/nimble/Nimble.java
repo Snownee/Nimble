@@ -1,12 +1,17 @@
 package snownee.nimble;
 
+import java.util.Random;
+
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
 import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -24,11 +29,15 @@ public class Nimble
     public static final String NAME = "Nimble";
 
     private static Logger logger;
+    private static Random random = new Random();
+    private static final KeyBinding kbFrontView = new KeyBinding(Nimble.MODID + ".keybind.frontView", Keyboard.KEY_F4, Nimble.MODID + ".gui.keygroup");
+    private static boolean useFront = false;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        ClientRegistry.registerKeyBinding(kbFrontView);
     }
 
     @EventHandler
@@ -77,6 +86,11 @@ public class Nimble
             }
         }
 
+        if (kbFrontView.isKeyDown())
+        {
+            return;
+        }
+
         if (getCameraMode() == 1)
         {
             float ptick = mc.getRenderPartialTicks();
@@ -96,6 +110,7 @@ public class Nimble
         if (distance < 3)
         {
             GlStateManager.translate(0, 0, 3 - distance);
+            resetView();
         }
     }
 
@@ -112,7 +127,20 @@ public class Nimble
         if (mc.player == null)
             return;
 
-        if (getCameraMode() == 2)
+        if (!ModConfig.frontKeyToggleMode && kbFrontView.isKeyDown())
+        {
+            setCameraMode(2);
+            return;
+        }
+        if (ModConfig.frontKeyToggleMode && kbFrontView.isPressed())
+        {
+            useFront = !useFront;
+            if (useFront)
+            {
+                setCameraMode(2);
+            }
+        }
+        if (getCameraMode() == 2 && !useFront)
         {
             setCameraMode(0);
         }
@@ -147,6 +175,13 @@ public class Nimble
     private static void setCameraMode(int mode)
     {
         Minecraft.getMinecraft().gameSettings.thirdPersonView = mode;
+        resetView();
+    }
+
+    private static void resetView()
+    {
+        // horrible hack to let global render reset states
+        Minecraft.getMinecraft().player.rotationPitch += random.nextBoolean() ? 0.000001 : -0.000001;
     }
 
     private static int getCameraMode()

@@ -15,6 +15,7 @@ public class ModConfig
     public static boolean nimbleElytra = true;
     public static boolean elytraRollScreen = true;
     public static int elytraTickDelay = 10;
+    public static boolean frontKeyToggleMode = false;
 
     @SubscribeEvent
     public static void onConfigReload(ConfigChangedEvent.OnConfigChangedEvent event)
