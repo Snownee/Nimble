@@ -1,7 +1,5 @@
 package snownee.nimble;
 
-import java.util.Random;
-
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
@@ -29,9 +27,9 @@ public class Nimble
     public static final String NAME = "Nimble";
 
     private static Logger logger;
-    private static Random random = new Random();
     private static final KeyBinding kbFrontView = new KeyBinding(Nimble.MODID + ".keybind.frontView", Keyboard.KEY_F4, Nimble.MODID + ".gui.keygroup");
     private static boolean useFront = false;
+    private static boolean flag = false;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -181,7 +179,8 @@ public class Nimble
     private static void resetView()
     {
         // horrible hack to let global render reset states
-        Minecraft.getMinecraft().player.rotationPitch += random.nextBoolean() ? 0.000001 : -0.000001;
+        flag = !flag;
+        Minecraft.getMinecraft().player.rotationPitch += flag ? 0.000001 : -0.000001;
     }
 
     private static int getCameraMode()
