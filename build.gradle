@@ -35,6 +35,7 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     // Must be specified before "minecraft" extension!
     minecraft "net.minecraftforge:forge:${forge_version}"
+    implementation files("Fermion-1.0.0.jar")
 }
 
 minecraft {
@@ -60,7 +61,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                kiwi {
+                nimble {
                     source sourceSets.main
                 }
             }
@@ -76,7 +77,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                kiwi {
+                nimble {
                     source sourceSets.main
                 }
             }

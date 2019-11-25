@@ -6,8 +6,7 @@ version="${file.jarVersion}"
 displayName="Nimble"
 authors="Snownee"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nimble"
-description='''Nimble is a mod by Snownee.
-'''
+description='''Nimble is a mod by Snownee.'''
 
 [[dependencies.nimble]]
    modId="forge"

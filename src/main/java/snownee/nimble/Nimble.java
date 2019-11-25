@@ -1,23 +1,21 @@
 package snownee.nimble;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -35,14 +33,10 @@ public class Nimble
     private static final KeyBinding kbFrontView = new KeyBinding(Nimble.MODID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.MODID + ".gui.keygroup");
     private static boolean useFront = false;
     private static boolean flag = false;
-    private static ModConfig config;
 
     public Nimble()
     {
         FMLJavaModLoadingContext.get().getModEventBus().register(this);
-        Pair<ModConfig, ForgeConfigSpec> configPair = new ForgeConfigSpec.Builder().configure(ModConfig::new);
-        ModLoadingContext.get().registerConfig(Type.CLIENT, configPair.getRight());
-        config = configPair.getLeft();
     }
 
     @SubscribeEvent
@@ -54,11 +48,18 @@ public class Nimble
     static int actualCameraMode = 0;
     static float distance = 0;
     static boolean elytraFlying = false;
+    
+    // Called by fermion transformer's code
+    public static CameraSetup fireCameraSetupEvent(ActiveRenderInfo info, float partial, float pitch, float yaw) {
+        CameraSetup event = new CameraSetup(Minecraft.getInstance().gameRenderer, info, partial, yaw, pitch, 0);
+        MinecraftForge.EVENT_BUS.post(event);
+        return event;
+    }
 
-    @SubscribeEvent
+    @SubscribeEvent // Todo fix this, event removed
     public static void cameraSetup(CameraSetup event)
     {
-        if (!config.enable.get())
+        if (!ModConfig.enable)
             return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.isGamePaused())
@@ -66,11 +67,11 @@ public class Nimble
         if (mc.player == null)
             return;
 
-        if (config.nimbleElytra.get() || config.elytraRollScreen.get())
+        if (ModConfig.nimbleElytra || ModConfig.elytraRollScreen)
         {
             if (mc.player.isElytraFlying())
             {
-                if (config.elytraRollScreen.get())
+                if (ModConfig.elytraRollScreen)
                 {
                     Vec3d look = mc.player.getLookVec();
                     look = new Vec3d(look.x, 0, look.z);
@@ -79,14 +80,14 @@ public class Nimble
                     event.setRoll((float) look.crossProduct(move).y * 10);
                 }
 
-                if (config.nimbleElytra.get() && mc.player.getTicksElytraFlying() == config.elytraTickDelay.get())
+                if (ModConfig.nimbleElytra && mc.player.getTicksElytraFlying() == ModConfig.elytraTickDelay)
                 {
                     elytraFlying = true;
                     setCameraMode(1);
                     actualCameraMode = 1;
                 }
             }
-            else if (config.nimbleElytra.get() && elytraFlying)
+            else if (ModConfig.nimbleElytra && elytraFlying)
             {
                 actualCameraMode = 0;
                 elytraFlying = false;
@@ -126,7 +127,7 @@ public class Nimble
     {
         if (event.phase != TickEvent.Phase.START)
             return;
-        if (!config.enable.get())
+        if (!ModConfig.enable)
             return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.isGamePaused())
@@ -134,12 +135,12 @@ public class Nimble
         if (mc.player == null)
             return;
 
-        if (!config.frontKeyToggleMode.get() && kbFrontView.isKeyDown())
+        if (!ModConfig.frontKeyToggleMode && kbFrontView.isKeyDown())
         {
             setCameraMode(2);
             return;
         }
-        if (config.frontKeyToggleMode.get() && kbFrontView.isPressed())
+        if (ModConfig.frontKeyToggleMode && kbFrontView.isPressed())
         {
             useFront = !useFront;
             if (useFront)
@@ -169,7 +170,7 @@ public class Nimble
     @SubscribeEvent
     public static void mountEvent(EntityMountEvent event)
     {
-        if (config.nimbleMounting.get())
+        if (ModConfig.nimbleMounting)
         {
             Minecraft mc = Minecraft.getInstance();
             if (event.getEntity() == mc.player)
@@ -187,7 +188,7 @@ public class Nimble
 
     private static void resetView()
     {
-        // horrible hack to let global render reset states
+        // horrible hack to let global render reset states todo 1.14?
         flag = !flag;
         Minecraft.getInstance().player.rotationPitch += flag ? 0.000001 : -0.000001;
     }
