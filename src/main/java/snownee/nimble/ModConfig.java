@@ -1,28 +1,25 @@
 package snownee.nimble;
 
-import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.ConfigManager;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 
-@EventBusSubscriber
-@Config(modid = Nimble.MODID)
-public class ModConfig
+final class ModConfig
 {
-    public static boolean enable = true;
-    public static boolean nimbleMounting = true;
-    public static boolean nimbleElytra = true;
-    public static boolean elytraRollScreen = true;
-    public static int elytraTickDelay = 10;
-    public static boolean frontKeyToggleMode = false;
+    final BooleanValue enable;
+    final BooleanValue nimbleMounting;
+    final BooleanValue nimbleElytra;
+    final BooleanValue elytraRollScreen;
+    final IntValue elytraTickDelay; 
+    final BooleanValue frontKeyToggleMode;
 
-    @SubscribeEvent
-    public static void onConfigReload(ConfigChangedEvent.OnConfigChangedEvent event)
+    ModConfig(ForgeConfigSpec.Builder spec)
     {
-        if (event.getModID().equals(Nimble.MODID))
-        {
-            ConfigManager.sync(Nimble.MODID, Config.Type.INSTANCE);
-        }
+        enable = spec.define("enable", true);
+        nimbleMounting = spec.define("nimbleMounting", true);
+        nimbleElytra = spec.define("nimbleElytra", true);
+        elytraRollScreen = spec.define("elytraRollScreen", true);
+        elytraTickDelay = spec.defineInRange("elytraTickDelay", 10, 0, 1000);
+        frontKeyToggleMode = spec.define("frontKeyToggleMode", false);
     }
 }
