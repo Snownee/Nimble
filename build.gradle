@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 
 version = "${version_major}.${version_minor}.${version_patch}"
 group = "snownee.nimble"
-archivesBaseName = "Nimble"
+archivesBaseName = "Nimble-1.14"
 
 if (System.getenv().BUILD_NUMBER != null) {
     // Maven version scheme uses dot to separate things

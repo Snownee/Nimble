@@ -84,7 +84,8 @@ public class Nimble
                     event.setRoll((float) look.crossProduct(move).y * 10);
                 }
 
-                if (ModConfig.nimbleElytra && mc.player.getTicksElytraFlying() == ModConfig.elytraTickDelay)
+                // sometimes if the game is too laggy, the specific tick may be skipped
+                if (ModConfig.nimbleElytra && mc.player.getTicksElytraFlying() >= ModConfig.elytraTickDelay)
                 {
                     elytraFlying = true;
                     setCameraMode(1);
