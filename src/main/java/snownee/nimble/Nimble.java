@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forgespi.Environment;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +37,10 @@ public class Nimble
 
     public Nimble()
     {
-        FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        if (Environment.get().getDist().isClient())
+        {
+            FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        }
     }
 
     @SubscribeEvent
@@ -56,7 +60,7 @@ public class Nimble
         return event;
     }
 
-    @SubscribeEvent // Todo fix this, event removed
+    @SubscribeEvent
     public static void cameraSetup(CameraSetup event)
     {
         if (!ModConfig.enable)
