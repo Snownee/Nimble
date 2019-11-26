@@ -1,28 +1,71 @@
 package snownee.nimble;
 
-import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.ConfigManager;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.config.ModConfig.ConfigReloading;
+import net.minecraftforge.fml.config.ModConfig.Type;
 
-@EventBusSubscriber
-@Config(modid = Nimble.MODID)
-public class ModConfig
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+
+@EventBusSubscriber(modid = Nimble.MODID, value = Dist.CLIENT, bus = Bus.MOD) final class ModConfig
 {
-    public static boolean enable = true;
-    public static boolean nimbleMounting = true;
-    public static boolean nimbleElytra = true;
-    public static boolean elytraRollScreen = true;
-    public static int elytraTickDelay = 10;
-    public static boolean frontKeyToggleMode = false;
+    static boolean enable = true;
+    static boolean nimbleMounting = true;
+    static boolean nimbleElytra = true;
+    static boolean elytraRollScreen = true;
+    static int elytraTickDelay = 10;
+    static boolean frontKeyToggleMode = false;
+
+    private static BooleanValue enableValue;
+    private static BooleanValue nimbleMountingValue;
+    private static BooleanValue nimbleElytraValue;
+    private static BooleanValue elytraRollScreenValue;
+    private static IntValue elytraTickDelayValue;
+    private static BooleanValue frontKeyToggleModeValue;
+
+    static
+    {
+        Pair<Void, ForgeConfigSpec> configPair = new ForgeConfigSpec.Builder().configure(ModConfig::setup);
+        ModLoadingContext.get().registerConfig(Type.CLIENT, configPair.getRight());
+    }
+
+    private static void refresh()
+    {
+        enable = enableValue.get();
+        nimbleMounting = nimbleMountingValue.get();
+        nimbleElytra = nimbleElytraValue.get();
+        elytraRollScreen = elytraRollScreenValue.get();
+        elytraTickDelay = elytraTickDelayValue.get();
+        frontKeyToggleMode = frontKeyToggleModeValue.get();
+    }
+
+    private static Void setup(ForgeConfigSpec.Builder spec)
+    {
+        enableValue = spec.define("enable", enable);
+        nimbleMountingValue = spec.define("nimbleMounting", nimbleMounting);
+        nimbleElytraValue = spec.define("nimbleElytra", nimbleElytra);
+        elytraRollScreenValue = spec.define("elytraRollScreen", elytraRollScreen);
+        elytraTickDelayValue = spec.defineInRange("elytraTickDelay", elytraTickDelay, 0, 1000);
+        frontKeyToggleModeValue = spec.define("frontKeyToggleMode", frontKeyToggleMode);
+        return null;
+    }
 
     @SubscribeEvent
-    public static void onConfigReload(ConfigChangedEvent.OnConfigChangedEvent event)
+    public static void onFileChange(ConfigReloading event)
     {
-        if (event.getModID().equals(Nimble.MODID))
-        {
-            ConfigManager.sync(Nimble.MODID, Config.Type.INSTANCE);
-        }
+        ((CommentedFileConfig) event.getConfig().getConfigData()).load();
+        refresh();
+    }
+
+    private ModConfig()
+    {
     }
 }

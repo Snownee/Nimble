@@ -1,19 +1,26 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
 version = "${version_major}.${version_minor}.${version_patch}"
 group = "snownee.nimble"
 archivesBaseName = "Nimble"
+
+if (System.getenv().BUILD_NUMBER != null) {
+    // Maven version scheme uses dot to separate things
+    version += ".${System.getenv().BUILD_NUMBER}"
+}
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -22,58 +29,68 @@ compileJava {
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-repositories {
-    maven {
-        name = "jei"
-        url = "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name = 'tterrag maven'
-        url = "http://maven.tterrag.com/"
-    }
-    maven {
-        name = "jared"
-        url = "http://maven.blamejared.com"
-    }
-    maven {
-        name = "tehnut"
-        url = "http://tehnut.info/maven"
-    }
-
-    flatDir {
-        dirs 'libs'
-    }
+dependencies {
+    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
+    // Must be specified before "minecraft" extension!
+    minecraft "net.minecraftforge:forge:${forge_version}"
+    implementation files("Fermion-1.0.0.jar")
 }
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    runDir = "run"
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'snapshot', version: '20191124-1.14.3'
+    
+    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    mappings = "${mapping_version}"
-    useDepAts = true
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
 
-    replace "@VERSION_INJECT@", project.version
-}
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', ''
 
-dependencies {
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                nimble {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', ''
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                nimble {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+
+    //useDepAts = true todo update
+    //replace "@VERSION_INJECT@", project.version
 }
 
 processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else except the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+    from ('src/main/java') {
+        include '**/*.json'
     }
 }
 
@@ -87,5 +104,27 @@ jar {
     manifest {
         attributes 'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}"
         attributes 'Timestamp': System.currentTimeMillis()
+    }
+}
+
+// Example configuration to allow publishing using the maven-publish task
+// we define a custom artifact that is sourced from the reobfJar output task
+// and then declare that to be published
+// Note you'll need to add a repository here
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
+}
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact reobfArtifact
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
     }
 }
