@@ -32,9 +32,9 @@ public final class NimbleLaunchPlugin extends AbstractLaunchPlugin
     @Override
     protected void populateMetadata(@Nonnull Builder builder)
     {
-        builder.setName("Nimble")
+        builder.setName("Nimble Core")
                 .addAuthor("Snownee")
-                .setVersion("0.0.2")
+                .setVersion("0.1.0")
                 .setDescription("Nimble is a mod by Snownee.");
     }
 

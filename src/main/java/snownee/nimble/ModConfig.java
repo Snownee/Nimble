@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig.ConfigReloading;
 import net.minecraftforge.fml.config.ModConfig.Type;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -62,6 +63,12 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
     public static void onFileChange(ConfigReloading event)
     {
         ((CommentedFileConfig) event.getConfig().getConfigData()).load();
+        refresh();
+    }
+
+    @SubscribeEvent
+    public static void preInit(FMLClientSetupEvent event)
+    {
         refresh();
     }
 

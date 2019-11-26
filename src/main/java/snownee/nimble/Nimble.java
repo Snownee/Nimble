@@ -98,7 +98,7 @@ public class Nimble
             }
         }
 
-        if (kbFrontView.isKeyDown())
+        if (useFront)
         {
             return;
         }
@@ -139,25 +139,32 @@ public class Nimble
         if (mc.player == null)
             return;
 
-        if (!ModConfig.frontKeyToggleMode && kbFrontView.isKeyDown())
+        int mode = getCameraMode();
+        if (!useFront && mode == 2)
+        {
+            setCameraMode(mode = 0);
+        }
+
+        if (!ModConfig.frontKeyToggleMode)
+        {
+            useFront = kbFrontView.isKeyDown();
+        }
+        else if (kbFrontView.isPressed())
+        {
+            useFront = !useFront;
+        }
+
+        if (useFront)
         {
             setCameraMode(2);
             return;
         }
-        if (ModConfig.frontKeyToggleMode && kbFrontView.isPressed())
+        else if (mode == 2)
         {
-            useFront = !useFront;
-            if (useFront)
-            {
-                setCameraMode(2);
-            }
-        }
-        if (getCameraMode() == 2 && !useFront)
-        {
-            setCameraMode(0);
+            setCameraMode(mode = actualCameraMode);
         }
 
-        if (getCameraMode() == 0)
+        if (mode == 0)
         {
             actualCameraMode = 0;
             if (distance > 0)
