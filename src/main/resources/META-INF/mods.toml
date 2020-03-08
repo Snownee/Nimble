@@ -1,33 +1,10 @@
 modLoader="javafml"
-loaderVersion="[28,)"
+loaderVersion="[31.1,)"
 [[mods]]
 modId="nimble"
 version="${file.jarVersion}"
 displayName="Nimble"
 authors="Snownee, liach"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nimble"
-description='''Huge thanks to my supporters:
-
-粉鱼 Lioness131 皮蛋 路人玖 Cherls idyllic_bean 鱼加盐有点咸 洋葱菜菜子 面条公爵 车轮饼 mc00zhu 洛华 纪华裕 可爱至吉 ycccz 东篱下i Ruriri
+description='''
 '''
-
-[[dependencies.nimble]]
-   modId="forge"
-   mandatory=true
-   versionRange="[28.1,)"
-   ordering="NONE"
-   side="BOTH"
-
-[[dependencies.nimble]]
-   modId="minecraft"
-   mandatory=true
-   versionRange="[1.14.4]"
-   ordering="NONE"
-   side="BOTH"
-
-[[dependencies.nimble]]
-    modId="fermion"
-    mandatory=true
-    versionRange="[1,2)"
-    ordering="BEFORE"
-    side="BOTH"

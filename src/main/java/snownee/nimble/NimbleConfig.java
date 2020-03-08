@@ -1,5 +1,9 @@
 package snownee.nimble;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
@@ -8,16 +12,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.config.ModConfig.ConfigReloading;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-
-@EventBusSubscriber(modid = Nimble.MODID, value = Dist.CLIENT, bus = Bus.MOD) final class ModConfig
-{
+@EventBusSubscriber(modid = Nimble.MODID, value = Dist.CLIENT, bus = Bus.MOD)
+final class NimbleConfig {
     static boolean enable = true;
     static boolean nimbleMounting = true;
     static boolean nimbleElytra = true;
@@ -32,14 +32,12 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
     private static IntValue elytraTickDelayValue;
     private static BooleanValue frontKeyToggleModeValue;
 
-    static
-    {
-        Pair<Void, ForgeConfigSpec> configPair = new ForgeConfigSpec.Builder().configure(ModConfig::setup);
+    static {
+        Pair<Void, ForgeConfigSpec> configPair = new ForgeConfigSpec.Builder().configure(NimbleConfig::setup);
         ModLoadingContext.get().registerConfig(Type.CLIENT, configPair.getRight());
     }
 
-    private static void refresh()
-    {
+    private static void refresh() {
         enable = enableValue.get();
         nimbleMounting = nimbleMountingValue.get();
         nimbleElytra = nimbleElytraValue.get();
@@ -48,8 +46,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
         frontKeyToggleMode = frontKeyToggleModeValue.get();
     }
 
-    private static Void setup(ForgeConfigSpec.Builder spec)
-    {
+    private static Void setup(ForgeConfigSpec.Builder spec) {
         enableValue = spec.define("enable", enable);
         nimbleMountingValue = spec.define("nimbleMounting", nimbleMounting);
         nimbleElytraValue = spec.define("nimbleElytra", nimbleElytra);
@@ -60,19 +57,15 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
     }
 
     @SubscribeEvent
-    public static void onFileChange(ConfigReloading event)
-    {
+    public static void onFileChange(ModConfig.Reloading event) {
         ((CommentedFileConfig) event.getConfig().getConfigData()).load();
         refresh();
     }
 
     @SubscribeEvent
-    public static void preInit(FMLClientSetupEvent event)
-    {
+    public static void preInit(FMLClientSetupEvent event) {
         refresh();
     }
 
-    private ModConfig()
-    {
-    }
+    private NimbleConfig() {}
 }

@@ -1,12 +1,14 @@
 package snownee.nimble;
 
+import org.lwjgl.glfw.GLFW;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,122 +19,93 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forgespi.Environment;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-
 @EventBusSubscriber(Dist.CLIENT)
 @Mod(Nimble.MODID)
-public class Nimble
-{
+public class Nimble {
     public static final String MODID = "nimble";
     public static final String NAME = "Nimble";
 
-    private static final Logger LOGGER = LogManager.getLogger(MODID);
     private static final KeyBinding kbFrontView = new KeyBinding(Nimble.MODID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.MODID + ".gui.keygroup");
     private static boolean useFront = false;
-    private static boolean flag = false;
 
-    public Nimble()
-    {
-        if (Environment.get().getDist().isClient())
-        {
+    public Nimble() {
+        if (Environment.get().getDist().isClient()) {
             FMLJavaModLoadingContext.get().getModEventBus().register(this);
         }
     }
 
     @SubscribeEvent
-    public void preInit(FMLClientSetupEvent event)
-    {
+    public void preInit(FMLClientSetupEvent event) {
         ClientRegistry.registerKeyBinding(kbFrontView);
     }
 
     static int actualCameraMode = 0;
     static float distance = 0;
     static boolean elytraFlying = false;
-    
-    // Called by fermion transformer's code
-    public static CameraSetup fireCameraSetupEvent(ActiveRenderInfo info, float partial, float pitch, float yaw) {
-        CameraSetup event = new CameraSetup(Minecraft.getInstance().gameRenderer, info, partial, yaw, pitch, 0);
-        MinecraftForge.EVENT_BUS.post(event);
-        return event;
-    }
 
     @SubscribeEvent
-    public static void cameraSetup(CameraSetup event)
-    {
-        if (!ModConfig.enable)
+    @OnlyIn(Dist.CLIENT)
+    public static void cameraSetup(CameraSetup event) {
+        if (!NimbleConfig.enable)
             return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.isGamePaused())
             return;
-        if (mc.player == null)
+        if (mc.player == null || mc.player.isSleeping())
             return;
 
-        if (ModConfig.nimbleElytra || ModConfig.elytraRollScreen)
-        {
-            if (mc.player.isElytraFlying())
-            {
-                if (ModConfig.elytraRollScreen)
-                {
+        if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
+            if (mc.player.isElytraFlying()) {
+                if (NimbleConfig.elytraRollScreen) {
                     Vec3d look = mc.player.getLookVec();
                     look = new Vec3d(look.x, 0, look.z);
                     Vec3d motion = mc.player.getMotion();
                     Vec3d move = new Vec3d(motion.x, 0, motion.z).normalize();
+                    //event.getMatrix().rotate(Vector3f.ZP.rotationDegrees((float) (look.crossProduct(move).y * 10)));
                     event.setRoll((float) look.crossProduct(move).y * 10);
                 }
 
                 // sometimes if the game is too laggy, the specific tick may be skipped
-                if (ModConfig.nimbleElytra && mc.player.getTicksElytraFlying() >= ModConfig.elytraTickDelay)
-                {
+                if (NimbleConfig.nimbleElytra && mc.player.getTicksElytraFlying() >= NimbleConfig.elytraTickDelay) {
                     elytraFlying = true;
                     setCameraMode(1);
                     actualCameraMode = 1;
                 }
-            }
-            else if (ModConfig.nimbleElytra && elytraFlying)
-            {
+            } else if (NimbleConfig.nimbleElytra && elytraFlying) {
                 actualCameraMode = 0;
                 elytraFlying = false;
             }
         }
 
-        if (useFront)
-        {
+        if (useFront) {
             return;
         }
 
-        if (getCameraMode() == 1)
-        {
+        if (getCameraMode() == 1) {
             float ptick = mc.getRenderPartialTicks();
             float delta = 0.05F + (float) Math.sin(distance / 3 * Math.PI) * 0.15F * ptick;
             distance += actualCameraMode == 1 ? delta : -delta;
-        }
-        else
-        {
+        } else {
             distance = 0;
             return;
         }
-        if (distance < 0)
-        {
+        if (distance < 0) {
             setCameraMode(0);
         }
         distance = Math.min(distance, 3);
-        if (distance < 3)
-        {
-            GlStateManager.translatef(0, 0, 3 - distance);
-            resetView();
+        if (distance < 3) {
+            ActiveRenderInfo info = event.getInfo();
+            info.movePosition(-info.calcCameraDistance(distance - 3), 0, 0);
+            //event.getMatrix().translate(0, 0, );
         }
     }
 
     @SubscribeEvent
-    public static void onFrame(TickEvent.RenderTickEvent event)
-    {
+    @OnlyIn(Dist.CLIENT)
+    public static void onFrame(TickEvent.RenderTickEvent event) {
         if (event.phase != TickEvent.Phase.START)
             return;
-        if (!ModConfig.enable)
+        if (!NimbleConfig.enable)
             return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.isGamePaused())
@@ -141,72 +114,49 @@ public class Nimble
             return;
 
         int mode = getCameraMode();
-        if (!useFront && mode == 2)
-        {
+        if (!useFront && mode == 2) {
             setCameraMode(mode = 0);
         }
 
-        if (!ModConfig.frontKeyToggleMode)
-        {
+        if (!NimbleConfig.frontKeyToggleMode) {
             useFront = kbFrontView.isKeyDown();
-        }
-        else if (kbFrontView.isPressed())
-        {
+        } else if (kbFrontView.isPressed()) {
             useFront = !useFront;
         }
 
-        if (useFront)
-        {
+        if (useFront) {
             setCameraMode(2);
             return;
-        }
-        else if (mode == 2)
-        {
+        } else if (mode == 2) {
             setCameraMode(mode = actualCameraMode);
         }
 
-        if (mode == 0)
-        {
+        if (mode == 0) {
             actualCameraMode = 0;
-            if (distance > 0)
-            {
+            if (distance > 0) {
                 setCameraMode(1);
             }
-        }
-        else if (distance == 0)
-        {
+        } else if (distance == 0) {
             actualCameraMode = 1;
         }
     }
 
     @SubscribeEvent
-    public static void mountEvent(EntityMountEvent event)
-    {
-        if (ModConfig.nimbleMounting)
-        {
+    @OnlyIn(Dist.CLIENT)
+    public static void mountEvent(EntityMountEvent event) {
+        if (NimbleConfig.nimbleMounting) {
             Minecraft mc = Minecraft.getInstance();
-            if (event.getEntity() == mc.player)
-            {
+            if (event.getEntity() == mc.player) {
                 setCameraMode(event.isMounting() ? 1 : 0);
             }
         }
     }
 
-    private static void setCameraMode(int mode)
-    {
+    private static void setCameraMode(int mode) {
         Minecraft.getInstance().gameSettings.thirdPersonView = mode;
-        resetView();
     }
 
-    private static void resetView()
-    {
-        // horrible hack to let global render reset states todo 1.14?
-        flag = !flag;
-        Minecraft.getInstance().player.rotationPitch += flag ? 0.000001 : -0.000001;
-    }
-
-    private static int getCameraMode()
-    {
+    private static int getCameraMode() {
         return Minecraft.getInstance().gameSettings.thirdPersonView;
     }
 }
