@@ -58,8 +58,10 @@ final class NimbleConfig {
 
     @SubscribeEvent
     public static void onFileChange(ModConfig.Reloading event) {
-        ((CommentedFileConfig) event.getConfig().getConfigData()).load();
-        refresh();
+        if (event.getConfig().getModId().equals(Nimble.MODID)) {
+            ((CommentedFileConfig) event.getConfig().getConfigData()).load();
+            refresh();
+        }
     }
 
     @SubscribeEvent
