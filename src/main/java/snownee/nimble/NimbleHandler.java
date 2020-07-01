@@ -5,7 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
@@ -45,10 +45,10 @@ public class NimbleHandler {
         if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
             if (mc.player.isElytraFlying()) {
                 if (NimbleConfig.elytraRollScreen) {
-                    Vec3d look = mc.player.getLookVec();
-                    look = new Vec3d(look.x, 0, look.z);
-                    Vec3d motion = mc.player.getMotion();
-                    Vec3d move = new Vec3d(motion.x, 0, motion.z).normalize();
+                    Vector3d look = mc.player.getLookVec();
+                    look = new Vector3d(look.x, 0, look.z);
+                    Vector3d motion = mc.player.getMotion();
+                    Vector3d move = new Vector3d(motion.x, 0, motion.z).normalize();
                     //event.getMatrix().rotate(Vector3f.ZP.rotationDegrees((float) (look.crossProduct(move).y * 10)));
                     event.setRoll((float) look.crossProduct(move).y * 10);
                 }
