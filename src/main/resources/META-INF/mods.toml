@@ -1,5 +1,7 @@
 modLoader="javafml"
-loaderVersion="[32,)"
+loaderVersion="[33,)"
+license="MIT"
+
 [[mods]]
 modId="nimble"
 version="${file.jarVersion}"

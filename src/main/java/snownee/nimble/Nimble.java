@@ -11,7 +11,7 @@ public class Nimble {
 
     public Nimble() {
         if (Environment.get().getDist().isClient()) {
-            FMLJavaModLoadingContext.get().getModEventBus().register(NimbleHandler.class);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(NimbleHandler::preInit);
         }
     }
 }
