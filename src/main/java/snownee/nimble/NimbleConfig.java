@@ -7,6 +7,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @EventBusSubscriber(modid = Nimble.MODID, value = Dist.CLIENT, bus = Bus.MOD)
 final class NimbleConfig {
     static boolean enable = true;
+    static float transitionSpeed = 1;
     static boolean nimbleMounting = true;
     static boolean nimbleElytra = true;
     static boolean elytraRollScreen = true;
@@ -26,6 +28,7 @@ final class NimbleConfig {
     static boolean frontKeyToggleMode = false;
 
     private static BooleanValue enableValue;
+    private static DoubleValue transitionSpeedValue;
     private static BooleanValue nimbleMountingValue;
     private static BooleanValue nimbleElytraValue;
     private static BooleanValue elytraRollScreenValue;
@@ -39,6 +42,7 @@ final class NimbleConfig {
 
     private static void refresh() {
         enable = enableValue.get();
+        transitionSpeed = transitionSpeedValue.get().floatValue();
         nimbleMounting = nimbleMountingValue.get();
         nimbleElytra = nimbleElytraValue.get();
         elytraRollScreen = elytraRollScreenValue.get();
@@ -48,6 +52,7 @@ final class NimbleConfig {
 
     private static Void setup(ForgeConfigSpec.Builder spec) {
         enableValue = spec.define("enable", enable);
+        transitionSpeedValue = spec.defineInRange("transitionSpeed", transitionSpeed, 0.1, 10);
         nimbleMountingValue = spec.define("nimbleMounting", nimbleMounting);
         nimbleElytraValue = spec.define("nimbleElytra", nimbleElytra);
         elytraRollScreenValue = spec.define("elytraRollScreen", elytraRollScreen);
@@ -69,5 +74,6 @@ final class NimbleConfig {
         refresh();
     }
 
-    private NimbleConfig() {}
+    private NimbleConfig() {
+    }
 }

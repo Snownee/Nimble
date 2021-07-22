@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.settings.PointOfView;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -70,8 +71,7 @@ public class NimbleHandler {
 
         if (getPointOfView() == PointOfView.THIRD_PERSON_BACK) {
             float ptick = mc.getTickLength();
-            float delta = 0.05F + (float) Math.sin(distance / 3 * Math.PI) * 0.15F * ptick;
-            distance += actualCameraMode == PointOfView.THIRD_PERSON_BACK ? delta : -delta;
+            distance += NimbleConfig.transitionSpeed * (actualCameraMode == PointOfView.THIRD_PERSON_BACK ? ptick * 0.1F : -ptick * 0.15F);
         } else {
             distance = 0;
             return;
@@ -79,10 +79,11 @@ public class NimbleHandler {
         if (distance < 0) {
             setPointOfView(PointOfView.FIRST_PERSON);
         }
-        distance = Math.min(distance, 3);
-        if (distance < 3) {
+        distance = MathHelper.clamp(distance, 0, 1);
+        if (distance < 1) {
+            float f = MathHelper.sin((float) (distance * Math.PI) / 2);
             ActiveRenderInfo info = event.getInfo();
-            info.movePosition(-info.calcCameraDistance(distance - 3), 0, 0);
+            info.movePosition(-info.calcCameraDistance((f - 1) * 3), 0, 0);
             //event.getMatrix().translate(0, 0, );
         }
     }
