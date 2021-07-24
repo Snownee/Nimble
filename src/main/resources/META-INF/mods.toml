@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[33,)"
+loaderVersion="[37,)"
 license="MIT"
 
 [[mods]]
@@ -8,5 +8,4 @@ version="${file.jarVersion}"
 displayName="Nimble"
 authors="Snownee, liach"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nimble"
-description='''
-'''
+description=""
