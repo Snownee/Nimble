@@ -9,7 +9,7 @@ assignees: ''
 
  If bug:
 
- * Forge Version: 
+ * Forge/Fabric Version: 
  * Mod Version: 
  * Can you reproduce this issue with relevant mods only?: yes/no
 

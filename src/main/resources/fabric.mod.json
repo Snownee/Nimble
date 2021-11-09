@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "nimble",
+  "version": "${version}",
+
+  "name": "Nimble",
+  "description": "Perspective animation, Auto third person, Elytra camera roll",
+  "authors": ["Snownee"],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/nimble-fabric",
+    "sources": "https://github.com/Snownee/Nimble",
+    "issues": "https://github.com/Snownee/Nimble/issues"
+  },
+
+  "license": "MIT",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": ["snownee.nimble.Nimble"],
+    "modmenu": ["snownee.nimble.compat.modmenu.NimbleModMenuCompat"]
+  },
+  "mixins": ["nimble.mixins.json"],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {
+    "another-mod": "*"
+  },
+
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/rRBvGkz"
+      }
+    }
+  }
+}

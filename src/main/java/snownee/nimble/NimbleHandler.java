@@ -2,38 +2,32 @@ package snownee.nimble;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.Camera;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityMountEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fmlclient.registry.ClientRegistry;
+import snownee.nimble.event.CameraSetup;
+import snownee.nimble.event.EntityMountEvent;
+import snownee.nimble.mixin.CameraAccessor;
 
-@EventBusSubscriber(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class NimbleHandler {
 
 	private static final KeyMapping kbFrontView = new KeyMapping(Nimble.MODID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.MODID + ".gui.keygroup");
 	private static boolean useFront = false;
 
-	public static void preInit(FMLClientSetupEvent event) {
-		ClientRegistry.registerKeyBinding(kbFrontView);
+	public static void preInit() {
+		KeyBindingHelper.registerKeyBinding(kbFrontView);
 	}
 
 	static CameraType actualCameraMode = CameraType.FIRST_PERSON;
 	static float distance = 0;
 	static boolean elytraFlying = false;
 
-	@SubscribeEvent
-	@OnlyIn(Dist.CLIENT)
 	public static void cameraSetup(CameraSetup event) {
 		if (!shouldWork())
 			return;
@@ -43,9 +37,9 @@ public class NimbleHandler {
 		if (mc.player == null || mc.player.isSleeping())
 			return;
 
-		if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
+		if (Nimble.CONFIG.nimbleElytra || Nimble.CONFIG.elytraRollScreen) {
 			if (mc.player.isFallFlying()) {
-				if (NimbleConfig.elytraRollScreen) {
+				if (Nimble.CONFIG.elytraRollScreen) {
 					Vec3 look = mc.player.getLookAngle();
 					look = new Vec3(look.x, 0, look.z);
 					Vec3 motion = mc.player.getDeltaMovement();
@@ -55,11 +49,11 @@ public class NimbleHandler {
 				}
 
 				// sometimes if the game is too laggy, the specific tick may be skipped
-				if (NimbleConfig.nimbleElytra && mc.player.getFallFlyingTicks() >= NimbleConfig.elytraTickDelay) {
+				if (Nimble.CONFIG.nimbleElytra && mc.player.getFallFlyingTicks() >= Nimble.CONFIG.elytraTickDelay) {
 					elytraFlying = true;
 					setCameraType(actualCameraMode = CameraType.THIRD_PERSON_BACK);
 				}
-			} else if (NimbleConfig.nimbleElytra && elytraFlying) {
+			} else if (Nimble.CONFIG.nimbleElytra && elytraFlying) {
 				actualCameraMode = CameraType.FIRST_PERSON;
 				elytraFlying = false;
 			}
@@ -71,7 +65,7 @@ public class NimbleHandler {
 
 		if (getCameraType() == CameraType.THIRD_PERSON_BACK) {
 			float ptick = mc.getDeltaFrameTime();
-			distance += NimbleConfig.transitionSpeed * (actualCameraMode == CameraType.THIRD_PERSON_BACK ? ptick * 0.1F : -ptick * 0.15F);
+			distance += Nimble.CONFIG.transitionSpeed * (actualCameraMode == CameraType.THIRD_PERSON_BACK ? ptick * 0.1F : -ptick * 0.15F);
 		} else {
 			distance = 0;
 			return;
@@ -82,19 +76,14 @@ public class NimbleHandler {
 		distance = Mth.clamp(distance, 0, 1);
 		if (distance < 1) {
 			float f = Mth.sin((float) (distance * Math.PI) / 2);
-			Camera info = event.getInfo();
-			info.move(-info.getMaxZoom((f - 1) * 3), 0, 0);
+			CameraAccessor info = (CameraAccessor) event.getInfo();
+			info._move(-info._getMaxZoom((f - 1) * 3), 0, 0);
 		}
 	}
 
-	@SubscribeEvent
-	@OnlyIn(Dist.CLIENT)
-	public static void onFrame(TickEvent.RenderTickEvent event) {
-		if (event.phase != TickEvent.Phase.START)
-			return;
+	public static void onFrame(Minecraft mc) {
 		if (!shouldWork())
 			return;
-		Minecraft mc = Minecraft.getInstance();
 		if (mc.isPaused())
 			return;
 		if (mc.player == null)
@@ -105,7 +94,7 @@ public class NimbleHandler {
 			setCameraType(mode = CameraType.FIRST_PERSON);
 		}
 
-		if (!NimbleConfig.frontKeyToggleMode) {
+		if (!Nimble.CONFIG.frontKeyToggleMode) {
 			useFront = kbFrontView.isDown();
 		} else if (kbFrontView.isDown()) {
 			useFront = !useFront;
@@ -128,8 +117,6 @@ public class NimbleHandler {
 		}
 	}
 
-	@SubscribeEvent
-	@OnlyIn(Dist.CLIENT)
 	public static void mountEvent(EntityMountEvent event) {
 		if (shouldWork()) {
 			Minecraft mc = Minecraft.getInstance();
@@ -148,6 +135,6 @@ public class NimbleHandler {
 	}
 
 	private static boolean shouldWork() {
-		return NimbleConfig.enable && getCameraType().ordinal() < 3;
+		return Nimble.CONFIG.enable && getCameraType().ordinal() < 3;
 	}
 }
