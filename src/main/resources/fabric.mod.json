@@ -27,9 +27,6 @@
     "minecraft": "1.17.x",
     "java": ">=16"
   },
-  "suggests": {
-    "another-mod": "*"
-  },
 
   "custom": {
     "modmenu": {
