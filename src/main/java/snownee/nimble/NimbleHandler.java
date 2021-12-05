@@ -2,32 +2,38 @@ package snownee.nimble;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import snownee.nimble.event.CameraSetup;
-import snownee.nimble.event.EntityMountEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import snownee.nimble.mixin.CameraAccessor;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class NimbleHandler {
 
 	private static final KeyMapping kbFrontView = new KeyMapping(Nimble.MODID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.MODID + ".gui.keygroup");
 	private static boolean useFront = false;
 
-	public static void preInit() {
-		KeyBindingHelper.registerKeyBinding(kbFrontView);
+	public static void preInit(FMLClientSetupEvent event) {
+		ClientRegistry.registerKeyBinding(kbFrontView);
 	}
 
 	static CameraType actualCameraMode = CameraType.FIRST_PERSON;
 	static float distance = 0;
 	static boolean elytraFlying = false;
 
+	@SubscribeEvent
 	public static void cameraSetup(CameraSetup event) {
 		if (!shouldWork())
 			return;
@@ -76,14 +82,18 @@ public class NimbleHandler {
 		distance = Mth.clamp(distance, 0, 1);
 		if (distance < 1) {
 			float f = Mth.sin((float) (distance * Math.PI) / 2);
-			CameraAccessor info = (CameraAccessor) event.getInfo();
+			CameraAccessor info = (CameraAccessor) event.getCamera();
 			info._move(-info._getMaxZoom((f - 1) * 3), 0, 0);
 		}
 	}
 
-	public static void onFrame(Minecraft mc) {
+	@SubscribeEvent
+	public static void onFrame(TickEvent.RenderTickEvent event) {
+		if (event.phase != TickEvent.Phase.START)
+			return;
 		if (!shouldWork())
 			return;
+		Minecraft mc = Minecraft.getInstance();
 		if (mc.isPaused())
 			return;
 		if (mc.player == null)
@@ -117,6 +127,7 @@ public class NimbleHandler {
 		}
 	}
 
+	@SubscribeEvent
 	public static void mountEvent(EntityMountEvent event) {
 		if (shouldWork()) {
 			Minecraft mc = Minecraft.getInstance();

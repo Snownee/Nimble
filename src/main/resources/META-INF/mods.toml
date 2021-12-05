@@ -1,0 +1,11 @@
+modLoader="javafml"
+loaderVersion="[38,)"
+license="MIT"
+
+[[mods]]
+modId="nimble"
+version="${file.jarVersion}"
+displayName="Nimble"
+authors="Snownee"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/nimble"
+description="Perspective animation, Auto third person, Elytra camera roll"

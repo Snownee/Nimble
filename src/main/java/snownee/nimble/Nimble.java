@@ -1,22 +1,28 @@
 package snownee.nimble;
 
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-import snownee.nimble.compat.config.ClothNimbleConfig;
+import org.apache.commons.lang3.tuple.Pair;
 
-public class Nimble implements ClientModInitializer {
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig.Type;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+
+@Mod(Nimble.MODID)
+public class Nimble {
 	public static final String MODID = "nimble";
 	public static final String NAME = "Nimble";
 	public static NimbleConfig CONFIG = new NimbleConfig();
 
-	@Override
-	public void onInitializeClient() {
-		if (FabricLoader.getInstance().isModLoaded("cloth-config2")) {
-			AutoConfig.register(ClothNimbleConfig.class, Toml4jConfigSerializer::new);
-			CONFIG = AutoConfig.getConfigHolder(ClothNimbleConfig.class).getConfig();
+	public Nimble() {
+		ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> "anything. i don't care", (remoteversionstring, networkbool) -> networkbool));
+		if (FMLEnvironment.dist.isClient()) {
+			FMLJavaModLoadingContext.get().getModEventBus().addListener(NimbleHandler::preInit);
+
+			Pair<Void, ForgeConfigSpec> configPair = new ForgeConfigSpec.Builder().configure(CONFIG::setup);
+			ModLoadingContext.get().registerConfig(Type.CLIENT, configPair.getRight());
 		}
-		NimbleHandler.preInit();
 	}
 }
