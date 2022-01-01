@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
@@ -22,6 +23,7 @@ public class NimbleHandler {
 
 	public static void preInit() {
 		KeyBindingHelper.registerKeyBinding(kbFrontView);
+		ClientTickEvents.END_CLIENT_TICK.register(NimbleHandler::tick);
 	}
 
 	static CameraType actualCameraMode = CameraType.FIRST_PERSON;
@@ -37,9 +39,9 @@ public class NimbleHandler {
 		if (mc.player == null || mc.player.isSleeping())
 			return;
 
-		if (Nimble.CONFIG.nimbleElytra || Nimble.CONFIG.elytraRollScreen) {
+		if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
 			if (mc.player.isFallFlying()) {
-				if (Nimble.CONFIG.elytraRollScreen) {
+				if (NimbleConfig.elytraRollScreen) {
 					Vec3 look = mc.player.getLookAngle();
 					look = new Vec3(look.x, 0, look.z);
 					Vec3 motion = mc.player.getDeltaMovement();
@@ -49,11 +51,11 @@ public class NimbleHandler {
 				}
 
 				// sometimes if the game is too laggy, the specific tick may be skipped
-				if (Nimble.CONFIG.nimbleElytra && mc.player.getFallFlyingTicks() >= Nimble.CONFIG.elytraTickDelay) {
+				if (NimbleConfig.nimbleElytra && mc.player.getFallFlyingTicks() >= NimbleConfig.elytraTickDelay) {
 					elytraFlying = true;
 					setCameraType(actualCameraMode = CameraType.THIRD_PERSON_BACK);
 				}
-			} else if (Nimble.CONFIG.nimbleElytra && elytraFlying) {
+			} else if (NimbleConfig.nimbleElytra && elytraFlying) {
 				actualCameraMode = CameraType.FIRST_PERSON;
 				elytraFlying = false;
 			}
@@ -65,7 +67,7 @@ public class NimbleHandler {
 
 		if (getCameraType() == CameraType.THIRD_PERSON_BACK) {
 			float ptick = mc.getDeltaFrameTime();
-			distance += Nimble.CONFIG.transitionSpeed * (actualCameraMode == CameraType.THIRD_PERSON_BACK ? ptick * 0.1F : -ptick * 0.15F);
+			distance += NimbleConfig.transitionSpeed * (actualCameraMode == CameraType.THIRD_PERSON_BACK ? ptick * 0.1F : -ptick * 0.15F);
 		} else {
 			distance = 0;
 			return;
@@ -94,10 +96,8 @@ public class NimbleHandler {
 			setCameraType(mode = CameraType.FIRST_PERSON);
 		}
 
-		if (!Nimble.CONFIG.frontKeyToggleMode) {
+		if (!NimbleConfig.frontKeyToggleMode) {
 			useFront = kbFrontView.isDown();
-		} else if (kbFrontView.isDown()) {
-			useFront = !useFront;
 		}
 
 		if (useFront) {
@@ -135,6 +135,12 @@ public class NimbleHandler {
 	}
 
 	private static boolean shouldWork() {
-		return Nimble.CONFIG.enable && getCameraType().ordinal() < 3;
+		return NimbleConfig.enable && getCameraType().ordinal() < 3;
+	}
+
+	private static void tick(Minecraft mc) {
+		if (kbFrontView.consumeClick()) {
+			useFront = !useFront;
+		}
 	}
 }

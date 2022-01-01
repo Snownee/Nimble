@@ -10,10 +10,22 @@ archivesBaseName = project.archives_base_name
 version = project.minecraft_version + "-fabric-" + project.mod_version
 group = project.maven_group
 
+loom {
+    mixin {
+        defaultRefmapName = "${project.mod_id}.refmap.json"
+    }
+}
+
 repositories {
     maven { url "https://maven.parchmentmc.org" }
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.terraformersmc.com/releases/" }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -26,19 +38,22 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
   		officialMojangMappings()
-  		parchment("org.parchmentmc.data:parchment-1.17.1:2021.09.05@zip")
+  		parchment("org.parchmentmc.data:parchment-1.18.1:2021.12.19@zip")
 	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
-	modApi("me.shedaniel.cloth:cloth-config-fabric:6.0.42") {
+    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    modImplementation "com.terraformersmc:modmenu:3.0.0"
+    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    
+    modImplementation "curse.maven:kiwi-fabric-549404:3581428"
 }
 
 processResources {
@@ -68,6 +83,7 @@ java {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
 	}

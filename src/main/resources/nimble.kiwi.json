@@ -1,0 +1,10 @@
+{
+  "KiwiConfig": [
+    {
+      "target": "snownee.nimble.NimbleConfig",
+      "data": {
+        "type": "CLIENT"
+      }
+    }
+  ]
+}

@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "snownee.nimble.mixin",
+  "refmap": "nimble.refmap.json",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
   ],
