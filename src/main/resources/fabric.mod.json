@@ -16,15 +16,14 @@
 
   "environment": "client",
   "entrypoints": {
-    "client": ["snownee.nimble.Nimble"],
-    "modmenu": ["snownee.nimble.compat.modmenu.NimbleModMenuCompat"]
+    "client": ["snownee.nimble.Nimble"]
   },
   "mixins": ["nimble.mixins.json"],
 
   "depends": {
     "fabricloader": ">=0.11.3",
     "fabric": "*",
-    "minecraft": "1.18.x",
+    "minecraft": ">=1.18",
     "java": ">=17"
   },
 
