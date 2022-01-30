@@ -10,6 +10,8 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.phys.Vec3;
 import snownee.nimble.event.CameraSetup;
 import snownee.nimble.event.EntityMountEvent;
@@ -121,6 +123,10 @@ public class NimbleHandler {
 		if (shouldWork()) {
 			Minecraft mc = Minecraft.getInstance();
 			if (event.getEntity() == mc.player) {
+				Entity vehicle = mc.player.getVehicle();
+				if (vehicle instanceof AbstractHorse && !((AbstractHorse) vehicle).isSaddled()) {
+					return;
+				}
 				setCameraType(event.isMounting() ? CameraType.THIRD_PERSON_BACK : CameraType.FIRST_PERSON);
 			}
 		}
