@@ -85,7 +85,7 @@ public class NimbleHandler {
 		if (distance < 1) {
 			float f = Mth.sin((float) (distance * Math.PI) / 2);
 			CameraAccess info = (CameraAccess) event.getCamera();
-			info.callMove(-info.callGetMaxZoom((f - 1) * 3), 0, 0);
+			info.callMove(info.callGetMaxZoom((1 - f) * 3), 0, 0);
 		}
 	}
 
