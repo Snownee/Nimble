@@ -15,7 +15,7 @@ import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.phys.Vec3;
 import snownee.nimble.event.CameraSetup;
 import snownee.nimble.event.EntityMountEvent;
-import snownee.nimble.mixin.CameraAccessor;
+import snownee.nimble.mixin.CameraAccess;
 
 @Environment(EnvType.CLIENT)
 public class NimbleHandler {
@@ -80,8 +80,8 @@ public class NimbleHandler {
 		distance = Mth.clamp(distance, 0, 1);
 		if (distance < 1) {
 			float f = Mth.sin((float) (distance * Math.PI) / 2);
-			CameraAccessor info = (CameraAccessor) event.getInfo();
-			info._move(-info._getMaxZoom((f - 1) * 3), 0, 0);
+			CameraAccess info = (CameraAccess) event.getInfo();
+			info.callMove(-info.callGetMaxZoom((f - 1) * 3), 0, 0);
 		}
 	}
 

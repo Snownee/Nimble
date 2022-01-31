@@ -11,7 +11,7 @@ import snownee.nimble.NimbleHandler;
 import snownee.nimble.event.EntityMountEvent;
 
 @Mixin(Entity.class)
-public class MixinEntity {
+public class EntityMixin {
 	@Inject(at = @At("TAIL"), method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z")
 	private void nimble$startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> ci) {
 		NimbleHandler.mountEvent(new EntityMountEvent((Entity) (Object) this, true));

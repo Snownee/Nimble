@@ -6,11 +6,11 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import net.minecraft.client.Camera;
 
 @Mixin(Camera.class)
-public interface CameraAccessor {
+public interface CameraAccess {
 
-	@Invoker("move")
-	void _move(double d, double e, double f);
+	@Invoker
+	void callMove(double d, double e, double f);
 
-	@Invoker("getMaxZoom")
-	double _getMaxZoom(double d);
+	@Invoker
+	double callGetMaxZoom(double d);
 }

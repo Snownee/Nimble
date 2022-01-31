@@ -14,7 +14,7 @@ import snownee.nimble.NimbleHandler;
 import snownee.nimble.event.CameraSetup;
 
 @Mixin(GameRenderer.class)
-public class MixinGameRenderer {
+public class GameRendererMixin {
 
 	@Inject(
 			at = @At(

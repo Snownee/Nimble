@@ -7,10 +7,10 @@
   "mixins": [
   ],
   "client": [
-    "CameraAccessor",
-    "MixinEntity",
-    "MixinGameRenderer",
-    "MixinMinecraft"
+    "CameraAccess",
+    "EntityMixin",
+    "GameRendererMixin",
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

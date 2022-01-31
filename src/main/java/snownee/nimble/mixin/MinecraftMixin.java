@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import snownee.nimble.NimbleHandler;
 
 @Mixin(Minecraft.class)
-public class MixinMinecraft {
+public class MinecraftMixin {
 
 	@Inject(
 			at = @At(
