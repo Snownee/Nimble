@@ -83,7 +83,7 @@ public class NimbleHandler {
 		if (distance < 1) {
 			float f = MathHelper.sin((float) (distance * Math.PI) / 2);
 			ActiveRenderInfo info = event.getInfo();
-			info.movePosition(-info.calcCameraDistance((f - 1) * 3), 0, 0);
+			info.movePosition(info.calcCameraDistance((1 - f) * 3), 0, 0);
 			//event.getMatrix().translate(0, 0, );
 		}
 	}
