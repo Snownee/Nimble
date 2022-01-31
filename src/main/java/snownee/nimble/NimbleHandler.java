@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.settings.PointOfView;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
@@ -46,7 +48,7 @@ public class NimbleHandler {
 		if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
 			if (mc.player.isElytraFlying()) {
 				if (NimbleConfig.elytraRollScreen) {
-					Vector3d look = mc.player.getLookVec();
+					Vector3d look = mc.player.getLook(Minecraft.getInstance().getRenderPartialTicks());
 					look = new Vector3d(look.x, 0, look.z);
 					Vector3d motion = mc.player.getMotion();
 					Vector3d move = new Vector3d(motion.x, 0, motion.z).normalize();
@@ -135,6 +137,10 @@ public class NimbleHandler {
 		if (shouldWork()) {
 			Minecraft mc = Minecraft.getInstance();
 			if (event.getEntity() == mc.player) {
+				Entity vehicle = mc.player.getRidingEntity();
+				if (vehicle instanceof AbstractHorseEntity && !((AbstractHorseEntity) vehicle).isHorseSaddled()) {
+					return;
+				}
 				setPointOfView(event.isMounting() ? PointOfView.THIRD_PERSON_BACK : PointOfView.FIRST_PERSON);
 			}
 		}
