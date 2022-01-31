@@ -7,7 +7,7 @@
   "mixins": [
   ],
   "client": [
-    "CameraAccessor"
+    "CameraAccess"
   ],
   "injectors": {
     "defaultRequire": 1

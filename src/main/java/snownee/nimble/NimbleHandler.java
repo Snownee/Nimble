@@ -18,7 +18,7 @@ import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import snownee.nimble.mixin.CameraAccessor;
+import snownee.nimble.mixin.CameraAccess;
 
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(Dist.CLIENT)
@@ -84,8 +84,8 @@ public class NimbleHandler {
 		distance = Mth.clamp(distance, 0, 1);
 		if (distance < 1) {
 			float f = Mth.sin((float) (distance * Math.PI) / 2);
-			CameraAccessor info = (CameraAccessor) event.getCamera();
-			info._move(-info._getMaxZoom((f - 1) * 3), 0, 0);
+			CameraAccess info = (CameraAccess) event.getCamera();
+			info.callMove(-info.callGetMaxZoom((f - 1) * 3), 0, 0);
 		}
 	}
 
