@@ -19,13 +19,14 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @EventBusSubscriber(modid = Nimble.MODID, value = Dist.CLIENT, bus = Bus.MOD)
 final class NimbleConfig {
-	static boolean enable = true;
-	static float transitionSpeed = 1;
-	static boolean nimbleMounting = true;
-	static boolean nimbleElytra = true;
-	static boolean elytraRollScreen = true;
-	static int elytraTickDelay = 10;
-	static boolean frontKeyToggleMode = false;
+	public static boolean enable = true;
+	public static float transitionSpeed = 1;
+	public static boolean nimbleMounting = true;
+	public static boolean nimbleElytra = true;
+	public static boolean elytraRollScreen = true;
+	public static int elytraTickDelay = 10;
+	public static int elytraRollStrength = 20;
+	public static boolean frontKeyToggleMode = false;
 
 	private static BooleanValue enableValue;
 	private static DoubleValue transitionSpeedValue;
@@ -33,6 +34,7 @@ final class NimbleConfig {
 	private static BooleanValue nimbleElytraValue;
 	private static BooleanValue elytraRollScreenValue;
 	private static IntValue elytraTickDelayValue;
+	private static IntValue elytraRollStrengthValue;
 	private static BooleanValue frontKeyToggleModeValue;
 
 	static {
@@ -47,6 +49,7 @@ final class NimbleConfig {
 		nimbleElytra = nimbleElytraValue.get();
 		elytraRollScreen = elytraRollScreenValue.get();
 		elytraTickDelay = elytraTickDelayValue.get();
+		elytraRollStrength = elytraRollStrengthValue.get();
 		frontKeyToggleMode = frontKeyToggleModeValue.get();
 	}
 
@@ -57,6 +60,7 @@ final class NimbleConfig {
 		nimbleElytraValue = spec.define("nimbleElytra", nimbleElytra);
 		elytraRollScreenValue = spec.define("elytraRollScreen", elytraRollScreen);
 		elytraTickDelayValue = spec.defineInRange("elytraTickDelay", elytraTickDelay, 0, 1000);
+		elytraRollStrengthValue = spec.defineInRange("elytraRollStrength", elytraRollStrength, 0, 100);
 		frontKeyToggleModeValue = spec.define("frontKeyToggleMode", frontKeyToggleMode);
 		return null;
 	}

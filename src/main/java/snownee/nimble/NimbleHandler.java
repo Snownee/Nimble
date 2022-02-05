@@ -33,6 +33,7 @@ public class NimbleHandler {
 	static PointOfView actualCameraMode = PointOfView.FIRST_PERSON;
 	static float distance = 0;
 	static boolean elytraFlying = false;
+	static float roll;
 
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
@@ -48,12 +49,15 @@ public class NimbleHandler {
 		if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
 			if (mc.player.isElytraFlying()) {
 				if (NimbleConfig.elytraRollScreen) {
-					Vector3d look = mc.player.getLook(Minecraft.getInstance().getRenderPartialTicks());
+					float pTicks = Minecraft.getInstance().getRenderPartialTicks();
+					Vector3d look = mc.player.getLook(pTicks);
 					look = new Vector3d(look.x, 0, look.z);
 					Vector3d motion = mc.player.getMotion();
 					Vector3d move = new Vector3d(motion.x, 0, motion.z).normalize();
 					//event.getMatrix().rotate(Vector3f.ZP.rotationDegrees((float) (look.crossProduct(move).y * 10)));
-					event.setRoll((float) look.crossProduct(move).y * 10);
+					float nRoll = (float) look.crossProduct(move).y * NimbleConfig.elytraRollStrength;
+					roll = MathHelper.lerp(pTicks, roll, nRoll);
+					event.setRoll(roll);
 				}
 
 				// sometimes if the game is too laggy, the specific tick may be skipped
