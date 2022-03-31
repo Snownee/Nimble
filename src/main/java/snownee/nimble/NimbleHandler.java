@@ -29,8 +29,9 @@ public class NimbleHandler {
 	}
 
 	static CameraType actualCameraMode = CameraType.FIRST_PERSON;
-	static float distance = 0;
+	static float distance;
 	static boolean elytraFlying = false;
+	static float roll;
 
 	public static void cameraSetup(CameraSetup event) {
 		if (!shouldWork())
@@ -44,12 +45,15 @@ public class NimbleHandler {
 		if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
 			if (mc.player.isFallFlying()) {
 				if (NimbleConfig.elytraRollScreen) {
-					Vec3 look = mc.player.getLookAngle();
+					float pTicks = Minecraft.getInstance().getFrameTime();
+					Vec3 look = mc.player.getViewVector(pTicks);
 					look = new Vec3(look.x, 0, look.z);
 					Vec3 motion = mc.player.getDeltaMovement();
 					Vec3 move = new Vec3(motion.x, 0, motion.z).normalize();
 					//event.getMatrix().rotate(Vector3f.ZP.rotationDegrees((float) (look.crossProduct(move).y * 10)));
-					event.setRoll((float) look.cross(move).y * 10);
+					float nRoll = (float) look.cross(move).y * NimbleConfig.elytraRollStrength;
+					roll = Mth.lerp(pTicks, roll, nRoll);
+					event.setRoll(roll);
 				}
 
 				// sometimes if the game is too laggy, the specific tick may be skipped
