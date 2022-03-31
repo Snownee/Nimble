@@ -21,6 +21,7 @@ final class NimbleConfig {
 	public boolean nimbleElytra = true;
 	public boolean elytraRollScreen = true;
 	public int elytraTickDelay = 10;
+	public int elytraRollStrength = 20;
 	public boolean frontKeyToggleMode = false;
 
 	private BooleanValue enableValue;
@@ -29,6 +30,7 @@ final class NimbleConfig {
 	private BooleanValue nimbleElytraValue;
 	private BooleanValue elytraRollScreenValue;
 	private IntValue elytraTickDelayValue;
+	private IntValue elytraRollStrengthValue;
 	private BooleanValue frontKeyToggleModeValue;
 
 	private void refresh() {
@@ -38,6 +40,7 @@ final class NimbleConfig {
 		nimbleElytra = nimbleElytraValue.get();
 		elytraRollScreen = elytraRollScreenValue.get();
 		elytraTickDelay = elytraTickDelayValue.get();
+		elytraRollStrength = elytraRollStrengthValue.get();
 		frontKeyToggleMode = frontKeyToggleModeValue.get();
 	}
 
@@ -48,6 +51,7 @@ final class NimbleConfig {
 		nimbleElytraValue = spec.define("nimbleElytra", nimbleElytra);
 		elytraRollScreenValue = spec.define("elytraRollScreen", elytraRollScreen);
 		elytraTickDelayValue = spec.defineInRange("elytraTickDelay", elytraTickDelay, 0, 1000);
+		elytraRollStrengthValue = spec.defineInRange("elytraRollStrength", elytraRollStrength, 0, 100);
 		frontKeyToggleModeValue = spec.define("frontKeyToggleMode", frontKeyToggleMode);
 		return null;
 	}
