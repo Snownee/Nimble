@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -53,7 +53,7 @@ dependencies {
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     
-    modImplementation "curse.maven:kiwi-fabric-549404:3581428"
+    modImplementation "curse.maven:kiwi-549404:3878011"
 }
 
 processResources {

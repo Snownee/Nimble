@@ -128,6 +128,9 @@ public class NimbleHandler {
 			Minecraft mc = Minecraft.getInstance();
 			if (event.getEntity() == mc.player) {
 				Entity vehicle = mc.player.getVehicle();
+				if (!NimbleConfig.doMountSwitch(vehicle)) {
+					return;
+				}
 				if (vehicle instanceof AbstractHorse && !((AbstractHorse) vehicle).isSaddled()) {
 					return;
 				}

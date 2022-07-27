@@ -17,7 +17,7 @@ public class EntityMixin {
 		NimbleHandler.mountEvent(new EntityMountEvent((Entity) (Object) this, true));
 	}
 
-	@Inject(at = @At("TAIL"), method = "removeVehicle()V")
+	@Inject(at = @At("HEAD"), method = "removeVehicle()V")
 	private void nimble$removeVehicle(CallbackInfo ci) {
 		NimbleHandler.mountEvent(new EntityMountEvent((Entity) (Object) this, false));
 	}
