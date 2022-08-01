@@ -4,8 +4,6 @@
   "package": "snownee.nimble.mixin",
   "compatibilityLevel": "JAVA_16",
   "refmap": "nimble.refmap.json",
-  "mixins": [
-  ],
   "client": [
     "CameraAccess"
   ],

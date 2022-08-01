@@ -11,13 +11,12 @@ import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import snownee.nimble.mixin.CameraAccess;
 
 @OnlyIn(Dist.CLIENT)
@@ -27,8 +26,8 @@ public class NimbleHandler {
 	private static final KeyMapping kbFrontView = new KeyMapping(Nimble.MODID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.MODID + ".gui.keygroup");
 	private static boolean useFront = false;
 
-	public static void preInit(FMLClientSetupEvent event) {
-		ClientRegistry.registerKeyBinding(kbFrontView);
+	public static void preInit(RegisterKeyMappingsEvent event) {
+		event.register(kbFrontView);
 	}
 
 	static CameraType actualCameraMode = CameraType.FIRST_PERSON;
@@ -37,7 +36,7 @@ public class NimbleHandler {
 	static float roll;
 
 	@SubscribeEvent
-	public static void cameraSetup(CameraSetup event) {
+	public static void cameraSetup(ComputeCameraAngles event) {
 		if (!shouldWork())
 			return;
 		Minecraft mc = Minecraft.getInstance();
@@ -46,26 +45,26 @@ public class NimbleHandler {
 		if (mc.player == null || mc.player.isSleeping())
 			return;
 
-		if (Nimble.CONFIG.nimbleElytra || Nimble.CONFIG.elytraRollScreen) {
+		if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
 			if (mc.player.isFallFlying()) {
-				if (Nimble.CONFIG.elytraRollScreen) {
+				if (NimbleConfig.elytraRollScreen) {
 					float pTicks = Minecraft.getInstance().getFrameTime();
 					Vec3 look = mc.player.getViewVector(pTicks);
 					look = new Vec3(look.x, 0, look.z);
 					Vec3 motion = mc.player.getDeltaMovement();
 					Vec3 move = new Vec3(motion.x, 0, motion.z).normalize();
 					//event.getMatrix().rotate(Vector3f.ZP.rotationDegrees((float) (look.crossProduct(move).y * 10)));
-					float nRoll = (float) look.cross(move).y * Nimble.CONFIG.elytraRollStrength;
+					float nRoll = (float) look.cross(move).y * NimbleConfig.elytraRollStrength;
 					roll = Mth.lerp(pTicks, roll, nRoll);
 					event.setRoll(roll);
 				}
 
 				// sometimes if the game is too laggy, the specific tick may be skipped
-				if (Nimble.CONFIG.nimbleElytra && mc.player.getFallFlyingTicks() >= Nimble.CONFIG.elytraTickDelay) {
+				if (NimbleConfig.nimbleElytra && mc.player.getFallFlyingTicks() >= NimbleConfig.elytraTickDelay) {
 					elytraFlying = true;
 					setCameraType(actualCameraMode = CameraType.THIRD_PERSON_BACK);
 				}
-			} else if (Nimble.CONFIG.nimbleElytra && elytraFlying) {
+			} else if (NimbleConfig.nimbleElytra && elytraFlying) {
 				actualCameraMode = CameraType.FIRST_PERSON;
 				elytraFlying = false;
 			}
@@ -77,7 +76,7 @@ public class NimbleHandler {
 
 		if (getCameraType() == CameraType.THIRD_PERSON_BACK) {
 			float ptick = mc.getDeltaFrameTime();
-			distance += Nimble.CONFIG.transitionSpeed * (actualCameraMode == CameraType.THIRD_PERSON_BACK ? ptick * 0.1F : -ptick * 0.15F);
+			distance += NimbleConfig.transitionSpeed * (actualCameraMode == CameraType.THIRD_PERSON_BACK ? ptick * 0.1F : -ptick * 0.15F);
 		} else {
 			distance = 0;
 			return;
@@ -110,7 +109,7 @@ public class NimbleHandler {
 			setCameraType(mode = CameraType.FIRST_PERSON);
 		}
 
-		if (!Nimble.CONFIG.frontKeyToggleMode) {
+		if (!NimbleConfig.frontKeyToggleMode) {
 			useFront = kbFrontView.isDown();
 		} else if (kbFrontView.isDown()) {
 			useFront = !useFront;
@@ -139,6 +138,9 @@ public class NimbleHandler {
 			Minecraft mc = Minecraft.getInstance();
 			if (event.getEntity() == mc.player) {
 				Entity vehicle = mc.player.getVehicle();
+				if (!NimbleConfig.doMountSwitch(event.getEntityBeingMounted())) {
+					return;
+				}
 				if (vehicle instanceof AbstractHorse && !((AbstractHorse) vehicle).isSaddled()) {
 					return;
 				}
@@ -156,6 +158,6 @@ public class NimbleHandler {
 	}
 
 	private static boolean shouldWork() {
-		return Nimble.CONFIG.enable && getCameraType().ordinal() < 3;
+		return NimbleConfig.enable && getCameraType().ordinal() < 3;
 	}
 }

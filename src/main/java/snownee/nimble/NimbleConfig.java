@@ -1,72 +1,55 @@
 package snownee.nimble;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import java.util.List;
+import java.util.Set;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
-import net.minecraftforge.common.ForgeConfigSpec.IntValue;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import com.google.common.collect.Sets;
 
-@EventBusSubscriber(modid = Nimble.MODID, value = Dist.CLIENT, bus = Bus.MOD)
-final class NimbleConfig {
-	public boolean enable = true;
-	public float transitionSpeed = 1;
-	public boolean nimbleMounting = true;
-	public boolean nimbleElytra = true;
-	public boolean elytraRollScreen = true;
-	public int elytraTickDelay = 10;
-	public int elytraRollStrength = 20;
-	public boolean frontKeyToggleMode = false;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import snownee.kiwi.config.ConfigUI;
+import snownee.kiwi.config.KiwiConfig;
+import snownee.kiwi.config.KiwiConfig.ConfigType;
+import snownee.kiwi.config.KiwiConfig.Range;
 
-	private BooleanValue enableValue;
-	private DoubleValue transitionSpeedValue;
-	private BooleanValue nimbleMountingValue;
-	private BooleanValue nimbleElytraValue;
-	private BooleanValue elytraRollScreenValue;
-	private IntValue elytraTickDelayValue;
-	private IntValue elytraRollStrengthValue;
-	private BooleanValue frontKeyToggleModeValue;
+@KiwiConfig(type = ConfigType.CLIENT)
+public class NimbleConfig {
+	public static boolean enable = true;
+	@Range(min = 0.1, max = 10)
+	public static float transitionSpeed = 1;
+	public static boolean nimbleMounting = true;
+	@ConfigUI.ItemType(String.class)
+	public static List<String> mountingEntityBlocklist = List.of();
+	public static boolean nimbleElytra = true;
+	public static boolean elytraRollScreen = true;
+	@Range(min = 0, max = 100)
+	public static int elytraRollStrength = 20;
+	@Range(min = 0, max = 1000)
+	public static int elytraTickDelay = 10;
+	public static boolean frontKeyToggleMode = false;
 
-	private void refresh() {
-		enable = enableValue.get();
-		transitionSpeed = transitionSpeedValue.get().floatValue();
-		nimbleMounting = nimbleMountingValue.get();
-		nimbleElytra = nimbleElytraValue.get();
-		elytraRollScreen = elytraRollScreenValue.get();
-		elytraTickDelay = elytraTickDelayValue.get();
-		elytraRollStrength = elytraRollStrengthValue.get();
-		frontKeyToggleMode = frontKeyToggleModeValue.get();
-	}
+	private static final Set<EntityType<?>> entityBlocklist = Sets.newHashSet();
 
-	Void setup(ForgeConfigSpec.Builder spec) {
-		enableValue = spec.define("enable", enable);
-		transitionSpeedValue = spec.defineInRange("transitionSpeed", transitionSpeed, 0.1, 10);
-		nimbleMountingValue = spec.define("nimbleMounting", nimbleMounting);
-		nimbleElytraValue = spec.define("nimbleElytra", nimbleElytra);
-		elytraRollScreenValue = spec.define("elytraRollScreen", elytraRollScreen);
-		elytraTickDelayValue = spec.defineInRange("elytraTickDelay", elytraTickDelay, 0, 1000);
-		elytraRollStrengthValue = spec.defineInRange("elytraRollStrength", elytraRollStrength, 0, 100);
-		frontKeyToggleModeValue = spec.define("frontKeyToggleMode", frontKeyToggleMode);
-		return null;
-	}
-
-	@SubscribeEvent
-	public static void onFileChange(ModConfigEvent.Reloading event) {
-		if (event.getConfig().getModId().equals(Nimble.MODID)) {
-			((CommentedFileConfig) event.getConfig().getConfigData()).load();
-			Nimble.CONFIG.refresh();
+	public static void onChanged(String path) {
+		if ("mountingEntityBlocklist".equals(path)) {
+			entityBlocklist.clear();
+			for (String id : mountingEntityBlocklist) {
+				//				if (id.startsWith("#")) {
+				//					if (id.length() == 1)
+				//						continue;
+				//					id = id.substring(1);
+				//					ResourceLocation rl = ResourceLocation.tryParse(id);
+				//					if (rl == null)
+				//						continue;
+				//					TagKey<EntityType<?>> tag = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, rl);
+				//				} else {
+				EntityType.byString(id).ifPresent(entityBlocklist::add);
+				//				}
+			}
 		}
 	}
 
-	@SubscribeEvent
-	public static void preInit(FMLClientSetupEvent event) {
-		Nimble.CONFIG.refresh();
+	public static boolean doMountSwitch(Entity entity) {
+		return entity == null || !entityBlocklist.contains(entity.getType());
 	}
-
 }
