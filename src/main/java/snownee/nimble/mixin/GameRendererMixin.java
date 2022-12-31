@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.GameRenderer;
 import snownee.nimble.NimbleHandler;
@@ -24,6 +24,6 @@ public class GameRendererMixin {
 	private void nimble$renderLevel(float pPartialTicks, long pFinishTimeNano, PoseStack pMatrixStack, CallbackInfo ci) {
 		CameraSetup cameraSetup = new CameraSetup(((GameRenderer) (Object) this).getMainCamera());
 		NimbleHandler.cameraSetup(cameraSetup);
-		pMatrixStack.mulPose(Vector3f.ZP.rotationDegrees(cameraSetup.getRoll()));
+		pMatrixStack.mulPose(Axis.ZP.rotationDegrees(cameraSetup.getRoll()));
 	}
 }
