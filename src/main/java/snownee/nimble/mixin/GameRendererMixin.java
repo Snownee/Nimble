@@ -1,5 +1,6 @@
 package snownee.nimble.mixin;
 
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
@@ -11,7 +12,6 @@ import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.GameRenderer;
 import snownee.nimble.NimbleHandler;
-import snownee.nimble.event.CameraSetup;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
@@ -22,8 +22,9 @@ public class GameRendererMixin {
 			), method = "renderLevel(FJLcom/mojang/blaze3d/vertex/PoseStack;)V"
 	)
 	private void nimble$renderLevel(float pPartialTicks, long pFinishTimeNano, PoseStack pMatrixStack, CallbackInfo ci) {
-		CameraSetup cameraSetup = new CameraSetup(((GameRenderer) (Object) this).getMainCamera());
-		NimbleHandler.cameraSetup(cameraSetup);
-		pMatrixStack.mulPose(Axis.ZP.rotationDegrees(cameraSetup.getRoll()));
+		MutableFloat roll = new MutableFloat();
+		NimbleHandler.cameraSetup(((GameRenderer) (Object) this).getMainCamera(), roll::setValue);
+		if (roll.floatValue() != 0)
+			pMatrixStack.mulPose(Axis.ZP.rotationDegrees(roll.floatValue()));
 	}
 }

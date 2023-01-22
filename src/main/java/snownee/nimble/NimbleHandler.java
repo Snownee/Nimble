@@ -2,10 +2,8 @@ package snownee.nimble;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import it.unimi.dsi.fastutil.floats.FloatConsumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -13,33 +11,75 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.phys.Vec3;
-import snownee.nimble.event.CameraSetup;
-import snownee.nimble.event.EntityMountEvent;
 import snownee.nimble.mixin.CameraAccess;
 
-@Environment(EnvType.CLIENT)
 public class NimbleHandler {
 
-	private static final KeyMapping kbFrontView = new KeyMapping(Nimble.MODID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.MODID + ".gui.keygroup");
+	public static final KeyMapping kbFrontView = new KeyMapping(Nimble.ID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.ID + ".gui.keygroup");
 	private static boolean useFront = false;
-
-	public static void preInit() {
-		KeyBindingHelper.registerKeyBinding(kbFrontView);
-		ClientTickEvents.END_CLIENT_TICK.register(NimbleHandler::tick);
-	}
 
 	static CameraType actualCameraMode = CameraType.FIRST_PERSON;
 	static float distance;
 	static boolean elytraFlying = false;
 	static float roll;
 
-	public static void cameraSetup(CameraSetup event) {
+	public static void tick(Minecraft mc) {
+		if (shouldWork() && kbFrontView.consumeClick()) {
+			useFront = !useFront;
+		}
+	}
+
+	public static void onFrame(Minecraft mc) {
+		if (!shouldWork() || mc.isPaused() || mc.player == null)
+			return;
+
+		CameraType mode = getCameraType();
+		if (!useFront && mode == CameraType.THIRD_PERSON_FRONT) {
+			setCameraType(mode = CameraType.FIRST_PERSON);
+		}
+
+		if (!NimbleConfig.frontKeyToggleMode) {
+			useFront = kbFrontView.isDown();
+		}
+
+		if (useFront) {
+			setCameraType(CameraType.THIRD_PERSON_FRONT);
+			return;
+		} else if (mode == CameraType.THIRD_PERSON_FRONT) {
+			setCameraType(mode = actualCameraMode);
+		}
+
+		if (mode == CameraType.FIRST_PERSON) {
+			actualCameraMode = CameraType.FIRST_PERSON;
+			if (distance > 0) {
+				setCameraType(CameraType.THIRD_PERSON_BACK);
+			}
+		} else if (distance == 0) {
+			actualCameraMode = CameraType.THIRD_PERSON_BACK;
+		}
+	}
+
+	public static void mountEvent(Entity entity, boolean mount) {
 		if (!shouldWork())
 			return;
 		Minecraft mc = Minecraft.getInstance();
-		if (mc.isPaused())
+		if (entity == mc.player) {
+			Entity vehicle = mc.player.getVehicle();
+			if (!NimbleConfig.doMountSwitch(vehicle)) {
+				return;
+			}
+			if (vehicle instanceof AbstractHorse horse && !horse.isSaddled()) {
+				return;
+			}
+			setCameraType(mount ? CameraType.THIRD_PERSON_BACK : CameraType.FIRST_PERSON);
+		}
+	}
+
+	public static void cameraSetup(Camera camera, FloatConsumer rollSetter) {
+		if (!shouldWork())
 			return;
-		if (mc.player == null || mc.player.isSleeping())
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.isPaused() || mc.player == null || mc.player.isSleeping())
 			return;
 
 		if (NimbleConfig.nimbleElytra || NimbleConfig.elytraRollScreen) {
@@ -53,7 +93,7 @@ public class NimbleHandler {
 					//event.getMatrix().rotate(Vector3f.ZP.rotationDegrees((float) (look.crossProduct(move).y * 10)));
 					float nRoll = (float) look.cross(move).y * NimbleConfig.elytraRollStrength;
 					roll = Mth.lerp(pTicks, roll, nRoll);
-					event.setRoll(roll);
+					rollSetter.accept(roll);
 				}
 
 				// sometimes if the game is too laggy, the specific tick may be skipped
@@ -84,58 +124,8 @@ public class NimbleHandler {
 		distance = Mth.clamp(distance, 0, 1);
 		if (distance < 1) {
 			float f = Mth.sin((float) (distance * Math.PI) / 2);
-			CameraAccess info = (CameraAccess) event.getInfo();
+			CameraAccess info = (CameraAccess) camera;
 			info.callMove(info.callGetMaxZoom((1 - f) * 3), 0, 0);
-		}
-	}
-
-	public static void onFrame(Minecraft mc) {
-		if (!shouldWork())
-			return;
-		if (mc.isPaused())
-			return;
-		if (mc.player == null)
-			return;
-
-		CameraType mode = getCameraType();
-		if (!useFront && mode == CameraType.THIRD_PERSON_FRONT) {
-			setCameraType(mode = CameraType.FIRST_PERSON);
-		}
-
-		if (!NimbleConfig.frontKeyToggleMode) {
-			useFront = kbFrontView.isDown();
-		}
-
-		if (useFront) {
-			setCameraType(CameraType.THIRD_PERSON_FRONT);
-			return;
-		} else if (mode == CameraType.THIRD_PERSON_FRONT) {
-			setCameraType(mode = actualCameraMode);
-		}
-
-		if (mode == CameraType.FIRST_PERSON) {
-			actualCameraMode = CameraType.FIRST_PERSON;
-			if (distance > 0) {
-				setCameraType(CameraType.THIRD_PERSON_BACK);
-			}
-		} else if (distance == 0) {
-			actualCameraMode = CameraType.THIRD_PERSON_BACK;
-		}
-	}
-
-	public static void mountEvent(EntityMountEvent event) {
-		if (shouldWork()) {
-			Minecraft mc = Minecraft.getInstance();
-			if (event.getEntity() == mc.player) {
-				Entity vehicle = mc.player.getVehicle();
-				if (!NimbleConfig.doMountSwitch(vehicle)) {
-					return;
-				}
-				if (vehicle instanceof AbstractHorse && !((AbstractHorse) vehicle).isSaddled()) {
-					return;
-				}
-				setCameraType(event.isMounting() ? CameraType.THIRD_PERSON_BACK : CameraType.FIRST_PERSON);
-			}
 		}
 	}
 
@@ -147,13 +137,8 @@ public class NimbleHandler {
 		return Minecraft.getInstance().options.getCameraType();
 	}
 
-	private static boolean shouldWork() {
+	public static boolean shouldWork() {
 		return NimbleConfig.enable && getCameraType().ordinal() < 3;
 	}
 
-	private static void tick(Minecraft mc) {
-		if (kbFrontView.consumeClick()) {
-			useFront = !useFront;
-		}
-	}
 }
