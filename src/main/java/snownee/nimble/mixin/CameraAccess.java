@@ -1,6 +1,7 @@
 package snownee.nimble.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 import net.minecraft.client.Camera;
@@ -13,4 +14,14 @@ public interface CameraAccess {
 
 	@Invoker
 	double callGetMaxZoom(double d);
+
+	@Invoker
+	void callSetPosition(double x, double y, double z);
+
+	@Accessor
+	float getEyeHeight();
+
+	@Accessor
+	float getEyeHeightOld();
+
 }

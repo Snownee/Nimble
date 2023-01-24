@@ -4,13 +4,19 @@
   "package": "snownee.nimble.mixin",
   "refmap": "nimble.refmap.json",
   "compatibilityLevel": "JAVA_16",
-  "mixins": [
-  ],
   "client": [
     "CameraAccess",
     "EntityMixin",
     "GameRendererMixin",
-    "MinecraftMixin"
+    "MinecraftMixin",
+    "OptionsMixin"
+  ],
+  "__client_disabled": [
+    "Add these following mixins to the client section if you want to enable fading effect (it is buggy)",
+    "ElytraLayerMixin",
+    "HumanoidArmorLayerMixin",
+    "LivingEntityRendererMixin",
+    "ModelPartMixin"
   ],
   "injectors": {
     "defaultRequire": 1
