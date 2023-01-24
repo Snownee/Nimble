@@ -119,7 +119,7 @@ public class NimbleHandler {
 			info.callSetPosition(x, y, z);
 
 			float f = Mth.sin((float) (distance * Math.PI) / 2);
-			float expectDistance = 4;
+			float expectDistance = NimbleConfig.expectedThirdPersonDistance;
 			if (modelFading) {
 				f *= expectDistance;
 			} else {
