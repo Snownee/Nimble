@@ -27,6 +27,8 @@ public class NimbleConfig {
 	@Range(min = 0, max = 1000)
 	public static int elytraTickDelay = 10;
 	public static boolean frontKeyToggleMode = false;
+	@Range(min = 1, max = 30)
+	public static float expectedThirdPersonDistance = 4;
 
 	private static final Set<EntityType<?>> entityBlocklist = Sets.newHashSet();
 

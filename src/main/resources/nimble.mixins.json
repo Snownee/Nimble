@@ -2,10 +2,15 @@
   "required": true,
   "minVersion": "0.8",
   "package": "snownee.nimble.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "plugin": "snownee.nimble.mixin.MixinPlugin",
   "refmap": "nimble.refmap.json",
+  "compatibilityLevel": "JAVA_16",
   "client": [
-    "CameraAccess"
+    "CameraAccess",
+    "EntityMixin",
+    "GameRendererMixin",
+    "MinecraftMixin",
+    "OptionsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

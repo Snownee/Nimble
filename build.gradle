@@ -184,9 +184,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
     
-    implementation fg.deobf("curse.maven:jade-324717:3903693")
-    implementation fg.deobf("curse.maven:kiwi-303657:3908296")
-    annotationProcessor "curse.maven:kiwi-303657:3908296"
+    implementation fg.deobf("curse.maven:jade-324717:4318618")
+    implementation fg.deobf("curse.maven:kiwi-303657:4036329")
+    annotationProcessor "curse.maven:kiwi-303657:4036329"
 }
 
 processResources {
