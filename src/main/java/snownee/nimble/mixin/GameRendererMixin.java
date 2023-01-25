@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.GameRenderer;
 import snownee.nimble.NimbleHandler;
@@ -25,6 +25,6 @@ public class GameRendererMixin {
 		MutableFloat roll = new MutableFloat();
 		NimbleHandler.cameraSetup(((GameRenderer) (Object) this).getMainCamera(), roll::setValue);
 		if (roll.floatValue() != 0)
-			pMatrixStack.mulPose(Vector3f.ZP.rotationDegrees(roll.floatValue()));
+			pMatrixStack.mulPose(Axis.ZP.rotationDegrees(roll.floatValue()));
 	}
 }
