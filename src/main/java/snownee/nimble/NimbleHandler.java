@@ -18,18 +18,18 @@ public class NimbleHandler {
 
 	public static final KeyMapping kbFrontView = new KeyMapping(Nimble.ID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.ID + ".gui.keygroup");
 
-	private static boolean useFront = false;
+	private static boolean useFront;
 	private static CameraType oMode;
 	private static CameraType mode;
 	private static CameraType targetMode;
 	private static float distance;
-	private static boolean elytraFlying = false;
-	private static boolean nimbleMounting = false;
+	private static boolean elytraFlying;
+	private static boolean nimbleMounting;
 	private static float roll;
 	public static boolean modelFading;
 
 	public static void tick(Minecraft mc) {
-		if (!shouldWork() || mc.isPaused()) {
+		if (!shouldWork() || mc.isPaused() || mc.player == null) {
 			return;
 		}
 		if (NimbleConfig.frontKeyToggleMode && kbFrontView.consumeClick()) {
@@ -51,11 +51,12 @@ public class NimbleHandler {
 	}
 
 	public static void onFrame(Minecraft mc) {
-		if (shouldWork() && !mc.isPaused() && !NimbleConfig.frontKeyToggleMode) {
-			useFront = kbFrontView.isDown();
-			if (useFront) {
-				setCameraType(CameraType.THIRD_PERSON_FRONT);
-			}
+		if (!shouldWork() || mc.isPaused() || mc.player == null || NimbleConfig.frontKeyToggleMode) {
+			return;
+		}
+		useFront = kbFrontView.isDown();
+		if (useFront) {
+			setCameraType(CameraType.THIRD_PERSON_FRONT);
 		}
 	}
 
