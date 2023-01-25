@@ -6,4 +6,6 @@ public interface INimbleOptions {
 
 	CameraType getOriginalCameraType();
 
+	void setOriginalCameraType(CameraType mode);
+
 }

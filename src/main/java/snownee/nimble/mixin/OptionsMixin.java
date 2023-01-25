@@ -27,4 +27,9 @@ public class OptionsMixin implements INimbleOptions {
 		return cameraType;
 	}
 
+	@Override
+	public void setOriginalCameraType(CameraType mode) {
+		cameraType = mode;
+	}
+
 }
