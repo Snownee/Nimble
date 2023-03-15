@@ -91,8 +91,8 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 		k = 0.0f;
 		float l = 0.0f;
 		if (!entity.isPassenger() && entity.isAlive()) {
-			k = Mth.lerp(partialTicks, entity.animationSpeedOld, entity.animationSpeed);
-			l = entity.animationPosition - entity.animationSpeed * (1.0f - partialTicks);
+			k = entity.walkAnimation.speed(partialTicks);
+			l = entity.walkAnimation.position(partialTicks);
 			if (entity.isBaby()) {
 				l *= 3.0f;
 			}
