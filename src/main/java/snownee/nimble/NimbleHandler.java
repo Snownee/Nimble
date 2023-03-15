@@ -18,36 +18,50 @@ public class NimbleHandler {
 
 	public static final KeyMapping kbFrontView = new KeyMapping(Nimble.ID + ".keybind.frontView", GLFW.GLFW_KEY_F4, Nimble.ID + ".gui.keygroup");
 
-	private static boolean useFront = false;
+	private static boolean useFront;
 	private static CameraType oMode;
 	private static CameraType mode;
 	private static CameraType targetMode;
 	private static float distance;
-	private static boolean elytraFlying = false;
-	private static boolean nimbleMounting = false;
+	private static boolean elytraFlying;
+	private static boolean nimbleMounting;
 	private static float roll;
 	public static boolean modelFading;
 
 	public static void tick(Minecraft mc) {
-		if (shouldWork() && !mc.isPaused() && NimbleConfig.frontKeyToggleMode && kbFrontView.consumeClick()) {
+		if (!shouldWork() || mc.isPaused() || mc.player == null) {
+			return;
+		}
+		if (NimbleConfig.frontKeyToggleMode && kbFrontView.consumeClick()) {
 			useFront = !useFront;
 			if (useFront) {
 				setCameraType(CameraType.THIRD_PERSON_FRONT);
 			}
 		}
-	}
-
-	public static void onFrame(Minecraft mc) {
-		if (shouldWork() && !mc.isPaused() && !NimbleConfig.frontKeyToggleMode) {
-			useFront = kbFrontView.isDown();
-			if (useFront) {
-				setCameraType(CameraType.THIRD_PERSON_FRONT);
+		if (NimbleConfig.nimbleElytra) {
+			if (mc.player.isFallFlying()) {
+				if (mc.player.getFallFlyingTicks() == NimbleConfig.elytraTickDelay && getOriginalCameraType() == CameraType.FIRST_PERSON) {
+					elytraFlying = true;
+					targetMode = CameraType.THIRD_PERSON_BACK;
+				}
+			} else {
+				elytraFlying = false;
 			}
 		}
 	}
 
+	public static void onFrame(Minecraft mc) {
+		if (!shouldWork() || mc.isPaused() || mc.player == null || NimbleConfig.frontKeyToggleMode) {
+			return;
+		}
+		useFront = kbFrontView.isDown();
+		if (useFront) {
+			setCameraType(CameraType.THIRD_PERSON_FRONT);
+		}
+	}
+
 	public static void mountEvent(Entity entity, boolean mount) {
-		if (!shouldWork())
+		if (!shouldWork() || !NimbleConfig.nimbleMounting)
 			return;
 		Minecraft mc = Minecraft.getInstance();
 		if (entity == mc.player) {
@@ -58,7 +72,12 @@ public class NimbleHandler {
 			if (vehicle instanceof AbstractHorse horse && !horse.isSaddled()) {
 				return;
 			}
-			nimbleMounting = mount;
+			if (mount && getOriginalCameraType() == CameraType.FIRST_PERSON) {
+				nimbleMounting = true;
+				targetMode = CameraType.THIRD_PERSON_BACK;
+			} else {
+				nimbleMounting = false;
+			}
 		}
 	}
 
@@ -71,8 +90,11 @@ public class NimbleHandler {
 
 		oMode = getCameraType(); // update mode
 		CameraType originalMode = getOriginalCameraType();
-		if ((elytraFlying || nimbleMounting) && originalMode == CameraType.FIRST_PERSON) {
-			targetMode = CameraType.THIRD_PERSON_BACK;
+		if (elytraFlying || nimbleMounting) {
+			if (originalMode == CameraType.THIRD_PERSON_BACK) {
+				setOriginalCameraType(targetMode = originalMode = CameraType.FIRST_PERSON);
+				elytraFlying = nimbleMounting = false;
+			}
 		} else {
 			targetMode = originalMode;
 		}
@@ -82,23 +104,14 @@ public class NimbleHandler {
 		}
 
 		float pTicks = mc.getFrameTime();
-		if (mc.player.isFallFlying()) {
-			if (NimbleConfig.elytraRollScreen) {
-				Vec3 look = mc.player.getViewVector(pTicks);
-				look = new Vec3(look.x, 0, look.z);
-				Vec3 motion = mc.player.getDeltaMovement();
-				Vec3 move = new Vec3(motion.x, 0, motion.z).normalize();
-				float nRoll = (float) look.cross(move).y * NimbleConfig.elytraRollStrength;
-				roll = Mth.lerp(pTicks, roll, nRoll);
-				rollSetter.accept(roll);
-			}
-
-			// sometimes if the game is too laggy, the specific tick may be skipped
-			if (NimbleConfig.nimbleElytra && originalMode == CameraType.FIRST_PERSON && mc.player.getFallFlyingTicks() >= NimbleConfig.elytraTickDelay) {
-				elytraFlying = true;
-			}
-		} else if (NimbleConfig.nimbleElytra && elytraFlying) {
-			elytraFlying = false;
+		if (NimbleConfig.elytraRollScreen && mc.player.isFallFlying()) {
+			Vec3 look = mc.player.getViewVector(pTicks);
+			look = new Vec3(look.x, 0, look.z);
+			Vec3 motion = mc.player.getDeltaMovement();
+			Vec3 move = new Vec3(motion.x, 0, motion.z).normalize();
+			float nRoll = (float) look.cross(move).y * NimbleConfig.elytraRollStrength;
+			roll = Mth.lerp(pTicks, roll, nRoll);
+			rollSetter.accept(roll);
 		}
 
 		if (useFront) {
@@ -139,6 +152,11 @@ public class NimbleHandler {
 	public static CameraType getOriginalCameraType() {
 		INimbleOptions options = (INimbleOptions) Minecraft.getInstance().options;
 		return options.getOriginalCameraType();
+	}
+
+	public static void setOriginalCameraType(CameraType mode) {
+		INimbleOptions options = (INimbleOptions) Minecraft.getInstance().options;
+		options.setOriginalCameraType(mode);
 	}
 
 	public static CameraType getCameraType() {
