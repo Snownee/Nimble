@@ -43,8 +43,8 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
 	@Inject(
 			method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(
-				"HEAD"
-			), cancellable = true
+			"HEAD"
+	), cancellable = true
 	)
 	private void nimble$render(T entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
 		if (entity != Minecraft.getInstance().player || NimbleHandler.getCameraType() != CameraType.THIRD_PERSON_BACK) {
@@ -95,7 +95,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 		if (!entity.isPassenger() && entity.isAlive()) {
 			WalkAnimationState animState = entity.walkAnimation;
 			k = animState.speed(partialTicks);
-			l = animState.position() - animState.speed() * (1.0f - partialTicks);
+			l = animState.position(partialTicks);
 			if (entity.isBaby()) {
 				l *= 3.0f;
 			}

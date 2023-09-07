@@ -1,37 +1,41 @@
 {
-  "schemaVersion": 1,
-  "id": "nimble",
-  "version": "${version}",
-
-  "name": "Nimble",
-  "description": "Perspective animation, Auto third person, Elytra camera roll",
-  "authors": ["Snownee"],
-  "contact": {
-    "homepage": "https://minecraft.curseforge.com/projects/nimble-fabric",
-    "sources": "https://github.com/Snownee/Nimble",
-    "issues": "https://github.com/Snownee/Nimble/issues"
-  },
-
-  "license": "MIT",
-
-  "environment": "client",
-  "entrypoints": {
-    "client": ["snownee.nimble.Nimble"]
-  },
-  "mixins": ["nimble.mixins.json"],
-
-  "depends": {
-    "fabricloader": "*",
-    "fabric-api": "*",
-    "minecraft": ">=1.20",
-    "java": ">=17"
-  },
-
-  "custom": {
-    "modmenu": {
-      "links": {
-        "modmenu.discord": "https://discord.gg/rRBvGkz"
-      }
-    }
-  }
+	"schemaVersion": 1,
+	"id": "nimble",
+	"version": "${version}",
+	"name": "Nimble",
+	"description": "Perspective animation, Auto third person, Elytra camera roll",
+	"authors": [
+		"Snownee"
+	],
+	"contact": {
+		"homepage": "https://minecraft.curseforge.com/projects/nimble-fabric",
+		"sources": "https://github.com/Snownee/Nimble",
+		"issues": "https://github.com/Snownee/Nimble/issues"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"snownee.nimble.Nimble"
+		],
+		"fabric-datagen": [
+			"snownee.nimble.NimbleDatagen"
+		]
+	},
+	"mixins": [
+		"nimble.mixins.json"
+	],
+	"depends": {
+		"fabricloader": "*",
+		"fabric-api": "*",
+		"minecraft": ">=1.20",
+		"java": ">=17"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/rRBvGkz"
+			}
+		}
+	}
 }

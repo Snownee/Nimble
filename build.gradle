@@ -11,9 +11,27 @@ archivesBaseName = project.archives_base_name
 version = project.minecraft_version + "-fabric-" + project.mod_version
 group = project.maven_group
 
+sourceSets {
+    main.resources.srcDirs += "$rootDir/src/generated/resources"
+}
+
 loom {
     mixin {
         defaultRefmapName = "${project.mod_id}.refmap.json"
+    }
+    runs {
+        //
+        // This adds a new gradle task that runs the datagen API: "gradlew runDatagenClient"
+        //
+        datagenClient {
+            inherit client
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"
+            vmArg "-Dfabric-api.datagen.modid=${mod_id}"
+
+            runDir "build/datagen"
+        }
     }
 }
 
@@ -86,6 +104,7 @@ java {
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude("/assets/${project.mod_id}/lang/en_us.existing.json")
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }
@@ -123,7 +142,7 @@ modrinth {
     versionType = "release" // This is the default -- can also be `beta` or `alpha`
     uploadFile = remapJar // With Loom, this MUST be set to `remapJar` instead of `jar`!
     gameVersions = ["1.20", "1.20.1"] // Must be an array, even with only one version
-    loaders = ["fabric"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
+    loaders = ["fabric", "quilt"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
     dependencies { // A special DSL for creating dependencies
         // scope.type
         // The scope can be `required`, `optional`, `incompatible`, or `embedded`

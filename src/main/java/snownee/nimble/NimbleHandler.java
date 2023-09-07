@@ -152,12 +152,12 @@ public class NimbleHandler {
 
 	public static CameraType getOriginalCameraType() {
 		INimbleOptions options = (INimbleOptions) Minecraft.getInstance().options;
-		return options.getOriginalCameraType();
+		return options.nimble$getOriginalCameraType();
 	}
 
 	public static void setOriginalCameraType(CameraType mode) {
 		INimbleOptions options = (INimbleOptions) Minecraft.getInstance().options;
-		options.setOriginalCameraType(mode);
+		options.nimble$setOriginalCameraType(mode);
 	}
 
 	public static CameraType getCameraType() {
