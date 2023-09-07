@@ -189,9 +189,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
     
-    implementation fg.deobf("curse.maven:jade-324717:4330163")
-    implementation fg.deobf("curse.maven:kiwi-303657:4287363")
-    annotationProcessor "curse.maven:kiwi-303657:4287363"
+    implementation fg.deobf("curse.maven:jade-324717:4711195")
+    implementation fg.deobf("curse.maven:kiwi-303657:4688568")
+    annotationProcessor "curse.maven:kiwi-303657:4688568"
 }
 
 processResources {
@@ -211,6 +211,7 @@ jar {
         ])
     }
     exclude '**/*.bat'
+    exclude("/assets/${project.mod_id}/lang/en_us.existing.json")
 }
 
 // Example configuration to allow publishing using the maven-publish plugin
@@ -238,7 +239,7 @@ modrinth {
     versionNumber = project.mod_version // You don't need to set this manually. Will fail if Modrinth has this version already
     versionType = "release" // This is the default -- can also be `beta` or `alpha`
     uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
-    gameVersions = ["1.19.3"] // Must be an array, even with only one version
+    gameVersions = ["1.20", "1.20.1"] // Must be an array, even with only one version
     loaders = ["forge"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
     dependencies { // A special DSL for creating dependencies
         // scope.type

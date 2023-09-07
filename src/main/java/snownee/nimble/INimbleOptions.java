@@ -4,8 +4,8 @@ import net.minecraft.client.CameraType;
 
 public interface INimbleOptions {
 
-	CameraType getOriginalCameraType();
+	CameraType nimble$getOriginalCameraType();
 
-	void setOriginalCameraType(CameraType mode);
+	void nimble$setOriginalCameraType(CameraType mode);
 
 }

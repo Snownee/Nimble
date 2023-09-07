@@ -23,12 +23,12 @@ public class OptionsMixin implements INimbleOptions {
 	}
 
 	@Override
-	public CameraType getOriginalCameraType() {
+	public CameraType nimble$getOriginalCameraType() {
 		return cameraType;
 	}
 
 	@Override
-	public void setOriginalCameraType(CameraType mode) {
+	public void nimble$setOriginalCameraType(CameraType mode) {
 		cameraType = mode;
 	}
 

@@ -30,7 +30,7 @@ public class MinecraftMixin {
 			)
 	)
 	private CameraType nimble$handleKeybinds(Options options) {
-		CameraType cameraType = ((INimbleOptions) options).getOriginalCameraType();
+		CameraType cameraType = ((INimbleOptions) options).nimble$getOriginalCameraType();
 		if (cameraType.cycle() == CameraType.THIRD_PERSON_FRONT) {
 			cameraType = CameraType.THIRD_PERSON_FRONT;
 		}

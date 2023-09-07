@@ -19,14 +19,14 @@ public class EntityMixin {
 	)
 	private void nimble$startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> ci) {
 		Entity self = (Entity) (Object) this;
-		if (self.level.isClientSide)
+		if (self.level().isClientSide)
 			NimbleHandler.mountEvent(self, true);
 	}
 
 	@Inject(at = @At("HEAD"), method = "removeVehicle()V")
 	private void nimble$removeVehicle(CallbackInfo ci) {
 		Entity self = (Entity) (Object) this;
-		if (self.level.isClientSide)
+		if (self.level().isClientSide)
 			NimbleHandler.mountEvent(self, false);
 	}
 }

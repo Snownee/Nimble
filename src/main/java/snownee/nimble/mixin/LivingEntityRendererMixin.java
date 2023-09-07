@@ -2,6 +2,8 @@ package snownee.nimble.mixin;
 
 import java.util.List;
 
+import net.minecraft.world.entity.WalkAnimationState;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -91,8 +93,9 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 		k = 0.0f;
 		float l = 0.0f;
 		if (!entity.isPassenger() && entity.isAlive()) {
-			k = Mth.lerp(partialTicks, entity.animationSpeedOld, entity.animationSpeed);
-			l = entity.animationPosition - entity.animationSpeed * (1.0f - partialTicks);
+			WalkAnimationState animState = entity.walkAnimation;
+			k = animState.speed(partialTicks);
+			l = animState.position(partialTicks);
 			if (entity.isBaby()) {
 				l *= 3.0f;
 			}
@@ -136,23 +139,23 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 	}
 
 	@Shadow
-	abstract float getAttackAnim(T livingBase, float partialTickTime);
+	protected abstract float getAttackAnim(T livingBase, float partialTickTime);
 
 	@Shadow
-	abstract float getBob(T livingBase, float partialTicks);
+	protected abstract float getBob(T livingBase, float partialTicks);
 
 	@Shadow
-	abstract void setupRotations(T entityLiving, PoseStack matrixStack, float ageInTicks, float rotationYaw, float partialTicks);
+	protected abstract void setupRotations(T entityLiving, PoseStack matrixStack, float ageInTicks, float rotationYaw, float partialTicks);
 
 	@Shadow
-	abstract void scale(T livingEntity, PoseStack matrixStack, float partialTickTime);
+	protected abstract void scale(T livingEntity, PoseStack matrixStack, float partialTickTime);
 
 	@Shadow
-	abstract boolean isBodyVisible(T livingEntity);
+	protected abstract boolean isBodyVisible(T livingEntity);
 
 	@Shadow
-	abstract RenderType getRenderType(T livingEntity, boolean bl, boolean bl2, boolean bl3);
+	protected abstract RenderType getRenderType(T livingEntity, boolean bl, boolean bl2, boolean bl3);
 
 	@Shadow
-	abstract float getWhiteOverlayProgress(T livingEntity, float partialTicks);
+	protected abstract float getWhiteOverlayProgress(T livingEntity, float partialTicks);
 }
