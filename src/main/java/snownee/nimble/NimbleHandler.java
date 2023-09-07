@@ -1,5 +1,6 @@
 package snownee.nimble;
 
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
@@ -60,7 +61,7 @@ public class NimbleHandler {
 		}
 	}
 
-	public static void mountEvent(Entity entity, boolean mount) {
+	public static void mountEvent(@NotNull Entity entity, boolean mount) {
 		if (!shouldWork() || !NimbleConfig.nimbleMounting)
 			return;
 		Minecraft mc = Minecraft.getInstance();
@@ -182,7 +183,7 @@ public class NimbleHandler {
 
 	public static float getAlphaFactor() {
 		float f = alphaFactor.get();
-		return f == 1 ? 0 : f; // dont know why but it works
+		return f == 1 ? 0 : f; // don't know why but it works
 	}
 
 	public static void applyAlphaFactor() {
