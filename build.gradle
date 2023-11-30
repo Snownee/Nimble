@@ -38,7 +38,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
   		officialMojangMappings()
-  		parchment("org.parchmentmc.data:parchment-1.18.1:2021.12.19@zip")
+  		parchment("org.parchmentmc.data:parchment-1.19.2:2022.11.27@zip")
 	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
@@ -50,10 +50,10 @@ dependencies {
     }
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
     
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    //modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     
-    modImplementation "curse.maven:kiwi-549404:3878011"
+    modImplementation "curse.maven:kiwi-549404:4652563"
 }
 
 processResources {

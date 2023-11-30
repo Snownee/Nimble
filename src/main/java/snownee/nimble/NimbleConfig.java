@@ -24,9 +24,11 @@ public class NimbleConfig {
 	public static boolean elytraRollScreen = true;
 	@Range(min = 0, max = 100)
 	public static int elytraRollStrength = 20;
-	@Range(min = 0, max = 1000)
+	@Range(min = 1, max = 1000)
 	public static int elytraTickDelay = 10;
 	public static boolean frontKeyToggleMode = false;
+	@Range(min = 1, max = 30)
+	public static float expectedThirdPersonDistance = 4;
 
 	private static final Set<EntityType<?>> entityBlocklist = Sets.newHashSet();
 

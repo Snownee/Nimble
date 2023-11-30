@@ -10,7 +10,8 @@
     "CameraAccess",
     "EntityMixin",
     "GameRendererMixin",
-    "MinecraftMixin"
+    "MinecraftMixin",
+    "OptionsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
