@@ -152,7 +152,11 @@ public class NimbleHandler {
 
 	public static CameraType getOriginalCameraType() {
 		INimbleOptions options = (INimbleOptions) Minecraft.getInstance().options;
-		return options.nimble$getOriginalCameraType();
+		CameraType type = options.nimble$getOriginalCameraType();
+		if (type == CameraType.THIRD_PERSON_FRONT) {
+			setOriginalCameraType(type = CameraType.FIRST_PERSON);
+		}
+		return type;
 	}
 
 	public static void setOriginalCameraType(CameraType mode) {
